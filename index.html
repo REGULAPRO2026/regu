@@ -2716,14 +2716,25 @@ function renderChat(msgs){
 }
 
 function actualizarMuro(){
+
   if(muroLock) return;
   muroLock = true;
-  google.script.run.withSuccessHandler(function(datos){
-    renderMuro(datos || []);
-    muroLock = false;
-  }).withFailureHandler(function(){
-    muroLock = false;
-  }).leerMuro();
+
+  const script = document.createElement("script");
+
+  script.src = API_URL + "?accion=leerMuro&callback=actualizarMuroDatos";
+
+  document.body.appendChild(script);
+
+}
+
+
+function actualizarMuroDatos(datos){
+
+  renderMuro(datos || []);
+
+  muroLock = false;
+
 }
 
 function renderMuro(datos){
