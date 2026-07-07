@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prueba Micrófono</title>
+</head>
+<body>
+
+<button onclick="iniciarVoz()">
+🎤 Hablar
+</button>
+
+<br><br>
+
+<input id="texto" style="width:400px">
+
+<pre id="log"></pre>
+
+<script>
+
+function log(msg){
+  console.log(msg);
+  document.getElementById("log").textContent += msg + "\n";
+}
+
+function iniciarVoz(){
+  console.log("top:", window.top === window);
+  console.log("origin:", location.origin);
+  console.log("href:", location.href);
+  console.log("secure:", window.isSecureContext);
+
+  const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
+
+  if(!SpeechRecognition){
+      log("SpeechRecognition NO soportado");
+      return;
+  }
+
+  log("SpeechRecognition OK");
+
+  const recognition = new SpeechRecognition();
+
+  recognition.lang = "es-ES";
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => log("Micrófono iniciado");
+
+  recognition.onresult = (event)=>{
+
+      let texto="";
+
+      for(let i=event.resultIndex;i<event.results.length;i++){
+          texto += event.results[i][0].transcript;
+      }
+
+      document.getElementById("texto").value = texto;
+
+      log("Texto: " + texto);
+
+  };
+
+  recognition.onerror = (e)=>{
+
+      log("ERROR");
+      log("error = " + e.error);
+      log("message = " + (e.message || ""));
+      console.log(e);
+
+  };
+
+  recognition.onend = ()=>{
+
+      log("Reconocimiento finalizado");
+
+  };
+
+  recognition.start();
+
+}
+
+</script>
+
+</body>
+</html>
