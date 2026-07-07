@@ -3198,15 +3198,27 @@ let MUSICA_DB = [];
 window.musicaListaLista = false;
 
 function cargarMusica(){
-  google.script.run.withSuccessHandler((data) => {
+
+  fetch(API_URL + "?accion=getMusicaRegu")
+  .then(response => response.json())
+  .then(data => {
+
     window.MUSICA_DB = data;
     window.musicaListaLista = true;
+
     if(window.musicaPendiente){
+
       const tipo = window.musicaPendiente;
       window.musicaPendiente = null;
       ejecutarMusica(tipo);
+
     }
-  }).getMusicaRegu();
+
+  })
+  .catch(error => {
+    console.error("ERROR cargando música:", error);
+  });
+
 }
 
 function musicaLugar(tipo){
