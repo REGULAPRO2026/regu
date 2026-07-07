@@ -1913,9 +1913,14 @@ function init(){
     });
   });
 
-  fetch(API_URL + "?accion=obtenerDatos")
-.then(response => response.json())
-.then(data => {
+  const script = document.createElement("script");
+
+script.src = API_URL + "?accion=obtenerDatos&callback=cargarDatos";
+
+document.body.appendChild(script);
+
+
+function cargarDatos(data){
 
     window.dataGlobal = data;
     dataGlobal = data;
@@ -1924,10 +1929,7 @@ function init(){
 
     render(data);
 
-})
-.catch(error => {
-    console.error("ERROR obteniendo datos:", error);
-});
+}
 
   document.getElementById("direccionMapa").addEventListener("keydown", e => {
     if(e.key === "Enter"){
