@@ -63,6 +63,10 @@ El Motor **NO**:
 
 La seguridad pertenece al Motor de Configuración o al Motor de Seguridad.
 
+> **Nota**
+
+La presente especificación desarrolla técnicamente los principios establecidos en los Artículos 3 y 4 de la Constitución de RegulaPro, donde se define al Nodo como la unidad fundamental del ecosistema.
+
 ---
 
 # 2. Entidades y Relaciones
