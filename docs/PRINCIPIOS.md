@@ -308,7 +308,7 @@ La calidad del proyecto dependerá de la disciplina con que estos principios sea
 
 ---
 
-## Principio de Comunicación Desacoplada
+# 24. Principio de Comunicación Desacoplada
 
 Los motores del CORE no deben depender de implementaciones internas de otros motores.
 
