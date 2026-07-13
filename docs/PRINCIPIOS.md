@@ -308,6 +308,14 @@ La calidad del proyecto dependerá de la disciplina con que estos principios sea
 
 ---
 
+## Principio de Comunicación Desacoplada
+
+Los motores del CORE no deben depender de implementaciones internas de otros motores.
+
+La comunicación entre motores deberá realizarse mediante contratos públicos, APIs o eventos definidos oficialmente.
+
+---
+
 # Conclusión
 
 Los Principios del CORE constituyen el marco permanente que orienta todas las decisiones arquitectónicas de RegulaPro.
