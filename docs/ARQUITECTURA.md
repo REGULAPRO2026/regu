@@ -174,6 +174,14 @@ Representan los pilares permanentes del ecosistema.
 
 Estos motores permiten la existencia y funcionamiento del resto del sistema.
 
+> **Nota Arquitectónica**
+
+El Motor API nunca accede directamente a los datos de negocio del ecosistema.
+
+Su interacción con el Motor de Base de Datos se limita exclusivamente a la gestión de información de infraestructura propia, como sesiones, auditorías, control de acceso, rate limiting y registros técnicos.
+
+Toda operación sobre datos del negocio deberá realizarse siempre mediante el motor responsable del dominio correspondiente.
+
 ---
 
 ## Motores de Inteligencia
