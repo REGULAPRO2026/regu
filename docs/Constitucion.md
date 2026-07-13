@@ -390,14 +390,6 @@ Entre los cimientos permanentes del ecosistema se encuentran:
 
 Cada Motor existe para resolver una capacidad permanente del ecosistema y nunca para satisfacer una pantalla o aplicación específica.
 
----
-
-# CAPÍTULO IV  
-# ARQUITECTURA CORE Y CONSTRUCCIÓN MODULAR  
-(Continuación)
-
----
-
 ## Artículo 18. Independencia de los Motores
 
 Los Motores son técnicamente independientes y ciegos a la implementación interna de los demás.
