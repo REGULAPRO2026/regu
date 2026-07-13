@@ -182,6 +182,13 @@ Su interacción con el Motor de Base de Datos se limita exclusivamente a la gest
 
 Toda operación sobre datos del negocio deberá realizarse siempre mediante el motor responsable del dominio correspondiente.
 
+Motor de Nodos            ✅ Formalizado
+Motor API                 ✅ Formalizado
+Motor Eventos             ⏳ Pendiente
+Motor Base de Datos       ⏳ Pendiente
+Motor Configuración       ⏳ Pendiente
+...
+
 ---
 
 ## Motores de Inteligencia
