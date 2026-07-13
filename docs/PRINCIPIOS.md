@@ -173,7 +173,7 @@ Toda interacción ocurre mediante:
 
 ---
 
-# 12. Principio de Neutralidad Tecnológica
+# 12. Principio de Independencia Tecnológica
 
 La arquitectura nunca dependerá de una tecnología específica.
 
