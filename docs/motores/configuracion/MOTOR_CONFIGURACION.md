@@ -21,13 +21,10 @@ Versión 1.0
 1. Misión y Alcance
 2. Responsabilidades
 3. Límites del Motor
-4. Modelo de Configuración
-5. Tipos de Configuración
-6. Contratos Públicos
+4. Principios de Configuración
+5. Modelo de Configuración
+6. Tipos de Configuración
 7. Relación con otros Motores
-8. Seguridad
-9. Evolución
-10. Conclusión
 
 ---
 
@@ -35,472 +32,678 @@ Versión 1.0
 
 ## Misión
 
-El Motor de Configuración constituye el sistema oficial de administración de parámetros que regulan el comportamiento del ecosistema RegulaPro.
+El Motor de Configuración es el componente responsable de administrar los parámetros modificables del ecosistema RegulaPro.
 
-Su misión es centralizar configuraciones modificables, evitando que reglas operativas dependan directamente de implementaciones de código.
-
-El Motor de Configuración permite que el ecosistema evolucione mediante ajustes controlados sin necesidad de modificar continuamente los motores internos.
+Su misión es permitir que el comportamiento operativo del sistema pueda evolucionar sin modificar el código fuente de los motores que forman parte del CORE.
 
 ---
 
-## Alcance
+El Motor Configuración actúa como la memoria operativa del sistema.
+
+Mientras:
+
+```
+Motor Base Datos
+
+↓
+
+guarda información permanente
+```
+
+el Motor Configuración:
+
+```
+Motor Configuración
+
+↓
+
+define cómo debe operar el sistema
+```
+
+---
+
+# Alcance
 
 El Motor de Configuración administra:
 
 - Parámetros globales del sistema.
 - Preferencias operativas.
-- Variables de comportamiento.
-- Configuraciones por Nodo.
-- Versiones de configuración.
-- Reglas dinámicas autorizadas.
+- Reglas ajustables.
+- Valores dinámicos.
+- Parámetros por entorno.
+- Configuraciones asociadas a Motores.
 
 ---
 
-El Motor de Configuración no contiene lógica de negocio.
+Ejemplos:
+
+```text
+Idioma predeterminado
+
+Límites de solicitudes API
+
+Tiempo máximo de espera
+
+Proveedor IA seleccionado
+
+Configuración de mapas
+
+Preferencias visuales
+```
+
+---
+
+El Motor Configuración permite modificar comportamiento sin reconstruir el sistema.
 
 Ejemplo:
 
-Correcto:
+Cambiar:
 
-```text
-Configuración:
-
-max_file_size = 50MB
+```
+limiteAPI = 100 solicitudes/minuto
 ```
 
-Incorrecto:
+a:
 
-```text
-Si el usuario es profesional entonces permitir archivo especial
+```
+limiteAPI = 500 solicitudes/minuto
 ```
 
-La segunda corresponde a lógica del motor responsable.
+sin modificar el Motor API.
 
 ---
 
 # 2. Responsabilidades
 
-El Motor de Configuración posee las siguientes responsabilidades:
+El Motor Configuración posee las siguientes responsabilidades:
 
 ---
 
-## 2.1. Administración Centralizada
+# 2.1. Administración de Parámetros Globales
 
-Mantener una fuente oficial de configuración para los motores del CORE.
-
----
-
-## 2.2. Separación entre Código y Parámetros
-
-Permitir modificar comportamiento sin alterar implementaciones internas.
+Gestionar valores que afectan al ecosistema completo.
 
 Ejemplos:
 
-- Límites.
-- Opciones activas.
-- Valores predeterminados.
-- Preferencias.
+```text
+Versión activa
+
+Reglas generales
+
+Parámetros de rendimiento
+
+Configuraciones de servicios
+```
 
 ---
 
-## 2.3. Control de Versiones
+# 2.2. Configuración por Motor
 
-Cada configuración debe poder identificarse mediante:
-
-- Versión.
-- Fecha de modificación.
-- Responsable del cambio.
-- Historial.
-
----
-
-## 2.4. Distribución de Configuración
-
-Proporcionar configuración a los motores autorizados mediante contratos públicos.
-
----
-
-## 2.5. Gestión de Cambios
-
-Registrar modificaciones relevantes y permitir auditoría.
-
----
-
-# 3. Límites del Motor
-
-El Motor de Configuración NO debe:
-
-- Contener reglas de negocio.
-- Reemplazar al Motor de Nodos.
-- Guardar credenciales secretas.
-- Administrar permisos.
-- Tomar decisiones funcionales.
-- Modificar directamente otros motores.
-
----
+Cada motor puede poseer parámetros propios mediante un espacio de configuración aislado.
 
 Ejemplo:
 
-Configuración correcta:
-
-```text
-ia.model = "modelo_actual"
 ```
-
-Configuración incorrecta:
-
-```text
-si_usuario_es_cliente_entonces_responder_de_esta_forma
-```
-
----
-
-# 4. Modelo de Configuración
-
-Toda configuración debe poseer una estructura común:
-
-```json
-{
- "key": "system.timeout",
- "value": 30000,
- "scope": "global",
- "version": "1.0",
- "updatedAt": "2026-07-13"
-}
-```
-
----
-
-Campos principales:
-
-## key
-
-Identificador único de la configuración.
-
----
-
-## value
-
-Valor asociado.
-
-Puede representar:
-
-- Texto.
-- Número.
-- Booleano.
-- Objeto estructurado.
-
----
-
-## scope
-
-Define el alcance:
-
-```text
-global
-node
-motor
-environment
-```
-
----
-
-## version
-
-Permite evolución controlada.
-
----
-
-## metadata
-
-Información adicional:
-
-- Autor.
-- Fecha.
-- Motivo del cambio.
-
-- ---
-
-# 5. Tipos de Configuración
-
-El Motor de Configuración organiza la información según su alcance y responsabilidad.
-
-Existen cuatro categorías principales.
-
----
-
-# 5.1. Configuración Global del Sistema
-
-Corresponde a parámetros que afectan al ecosistema completo.
-
-Ejemplos:
-
-```text
-system.timezone
-
-system.language
-
-system.maintenance_mode
-
-api.rate_limit
+Motor API
 
 api.timeout
-```
 
-Características:
+api.rateLimit
 
-- Aplicable a múltiples motores.
-- Administrada por operadores autorizados.
-- Posee auditoría obligatoria.
 
----
+Motor IA
 
-# 5.2. Configuración por Motor
+ia.provider
 
-Cada motor puede poseer parámetros propios de funcionamiento.
+ia.model
 
-Ejemplos:
 
-Motor IA:
+Motor Mapas
 
-```text
-ia.max_tokens
-
-ia.default_model
-```
-
-Motor Multimedia:
-
-```text
-multimedia.max_size
-
-multimedia.allowed_formats
-```
-
-Motor API:
-
-```text
-api.max_connections
-
-api.request_timeout
-```
-
-El Motor de Configuración almacena estos valores.
-
-Sin embargo, cada motor interpreta su significado.
-
----
-
-# 5.3. Configuración por Nodo
-
-Los Nodos pueden poseer preferencias personales o de funcionamiento.
-
-Ejemplos:
-
-```text
-node.theme
-
-node.language
-
-node.notification_preferences
-
-node.interface_mode
-```
-
-Esta configuración representa preferencias del Nodo.
-
-No representa identidad.
-
-La identidad pertenece al Motor de Nodos.
-
----
-
-La relación correcta es:
-
-```
-Nodo
-
-↓
-
-Motor Nodos
-(definición e identidad)
-
-↓
-
-Motor Configuración
-(preferencias y parámetros)
+maps.defaultZoom
 ```
 
 ---
 
-# 5.4. Configuración de Entorno
+El Motor Configuración almacena los valores.
 
-Corresponde a parámetros relacionados con ambientes de ejecución.
+El motor responsable interpreta su significado.
 
-Ejemplos:
+---
 
-```text
-environment.production
+# 2.3. Gestión de Entornos
 
-environment.region
+Permitir configuraciones diferentes según contexto.
 
-environment.feature_flags
+Ejemplo:
+
 ```
-
-Permite separar:
-
-```text
 Desarrollo
 
+↓
+
 Pruebas
+
+↓
 
 Producción
 ```
 
 ---
 
-# 6. Contratos Públicos
-
-El Motor de Configuración expone interfaces para consultar y modificar configuraciones autorizadas.
+Una configuración de desarrollo no debe afectar automáticamente producción.
 
 ---
 
-# 6.1. Consulta de Configuración
+# 2.4. Actualización Dinámica
+
+Permitir cambios controlados mientras el sistema está funcionando.
+
+Ejemplo:
+
+Cambiar:
+
+```
+Modelo IA utilizado
+```
+
+sin detener todo el ecosistema.
+
+---
+
+# 2.5. Historial de Cambios
+
+Registrar modificaciones importantes.
+
+Ejemplo:
+
+```text
+CONFIG_UPDATED
+
+CONFIG_VERSION_CHANGED
+
+CONFIG_ROLLED_BACK
+```
+
+---
+
+# 3. Límites del Motor
+
+El Motor Configuración NO debe:
+
+- Guardar secretos.
+- Administrar contraseñas.
+- Gestionar identidad.
+- Definir permisos.
+- Contener lógica de negocio.
+- Reemplazar la Base de Datos.
+- Tomar decisiones funcionales.
+
+---
+
+Ejemplo incorrecto:
+
+Guardar:
+
+```text
+OPENAI_API_KEY
+```
+
+Corresponde a:
+
+```
+Motor Secretos
+```
+
+---
+
+Ejemplo incorrecto:
+
+Definir:
+
+```text
+Usuario premium puede hacer X
+```
+
+Corresponde a:
+
+```
+Motor API / Seguridad
+```
+
+---
+
+Ejemplo correcto:
+
+Guardar:
+
+```text
+max_tokens = 4000
+```
+
+Porque es un parámetro operativo.
+
+---
+
+# 4. Principios de Configuración
+
+## 4.1. Separación entre Configuración y Código
+
+Los valores modificables no deben estar escritos permanentemente dentro de los motores.
+
+---
+
+Incorrecto:
+
+```javascript
+MAX_USERS = 1000
+```
+
+Correcto:
+
+```
+Motor Configuración
+
+↓
+
+MAX_USERS = 1000
+```
+
+---
+
+# 4.2. Configuración No Es Lógica
+
+La configuración entrega valores.
+
+No ejecuta decisiones.
+
+---
+
+Ejemplo:
+
+Configuración:
+
+```
+modoIA = avanzado
+```
+
+Motor IA:
+
+```
+decide cómo utilizarlo
+```
+
+---
+
+# 4.3. Independencia Tecnológica
+
+El Motor Configuración no depende de un formato específico.
+
+Puede utilizar:
+
+```
+JSON
+
+↓
+
+Base Datos
+
+↓
+
+Archivos YAML
+
+↓
+
+Servicio remoto
+```
+
+---
+
+Mientras mantenga su contrato público.
+
+---
+
+# 4.4. Control de Cambios
+
+Toda modificación importante debe ser:
+
+- Identificada.
+- Registrada.
+- Versionada.
+- Auditada.
+
+---
+
+**Fin Parte 1**
+
+# 5. Modelo de Configuración
+
+El Motor Configuración organiza la información mediante una estructura jerárquica.
+
+La configuración se divide en niveles para evitar mezclas de responsabilidades.
+
+---
+
+# 5.1. Configuración del Sistema
+
+Corresponde a valores generales que afectan al ecosistema completo.
+
+Ejemplos:
+
+```text
+system.name
+
+system.version
+
+system.environment
+
+system.defaultLanguage
+```
+
+---
+
+Estas configuraciones son administradas por el CORE.
+
+No pertenecen a ningún usuario específico.
+
+---
+
+# 5.2. Configuración de Motores
+
+Cada motor del CORE puede poseer configuraciones propias.
+
+Ejemplo:
+
+```
+Motor API
+
+api.timeout
+
+api.rateLimit
+
+api.allowedOrigins
+```
+
+---
+
+```
+Motor IA
+
+ia.defaultProvider
+
+ia.defaultModel
+
+ia.maxContext
+```
+
+---
+
+```
+Motor Mapas
+
+maps.defaultProvider
+
+maps.defaultZoom
+```
+
+---
+
+El Motor Configuración almacena estos valores.
+
+El significado pertenece exclusivamente al motor propietario.
+
+---
+
+# 5.3. Configuración por Nodo
+
+Algunos valores pertenecen a preferencias individuales de un Nodo.
+
+Ejemplo:
+
+```text
+node.preferences.language
+
+node.preferences.theme
+
+node.preferences.notifications
+```
+
+---
+
+El Motor Configuración puede administrar estos valores operativos.
+
+Sin embargo:
+
+La identidad del Nodo pertenece exclusivamente al:
+
+```
+Motor de Nodos
+```
+
+---
+
+Separación:
+
+```
+Motor Nodos
+
+↓
+
+¿Quién es?
+
+
+Motor Configuración
+
+↓
+
+¿Cómo prefiere funcionar?
+```
+
+---
+
+# 5.4. Configuración Temporal
+
+Algunos valores pueden existir solamente durante un período determinado.
+
+Ejemplo:
+
+```text
+feature.enabled=true
+
+desde: 2026-07-01
+
+hasta: 2026-08-01
+```
+
+---
+
+Permite:
+
+- pruebas controladas.
+- activación gradual.
+- experimentos internos.
+
+---
+
+# 6. Contratos Públicos
+
+El Motor Configuración expone contratos públicos para que los demás motores puedan consultar parámetros sin conocer su almacenamiento interno.
+
+---
+
+Los motores nunca deben acceder directamente a:
+
+```
+tablas
+
+archivos
+
+variables internas
+```
+
+---
+
+La comunicación correcta:
+
+```
+Motor API
+
+↓
+
+Configuration Engine
+
+↓
+
+Storage interno
+```
+
+---
+
+# 6.1. Interfaz Principal
 
 Contrato conceptual:
 
 ```text
-getConfiguration(key, scope)
-```
-
-Ejemplo:
-
-```text
-getConfiguration(
-    "api.timeout",
-    "global"
-)
-```
-
-Respuesta:
-
-```json
-{
- "key": "api.timeout",
- "value": 30000,
- "version": "1.0"
-}
+IConfigurationEngine
 ```
 
 ---
 
-# 6.2. Actualización de Configuración
-
-Contrato:
+Operaciones principales:
 
 ```text
-updateConfiguration(config)
+get(key)
+
+set(key,value)
+
+delete(key)
+
+exists(key)
+
+list(namespace)
+
+getVersion()
 ```
-
-Toda modificación requiere:
-
-- Validación.
-- Permiso.
-- Registro histórico.
 
 ---
 
-# 6.3. Suscripción a Cambios
+# 6.2. Ejemplo de Consulta
 
-Los motores pueden suscribirse a modificaciones relevantes.
+Motor API necesita conocer el límite de solicitudes.
+
+Flujo correcto:
+
+```
+Motor API
+
+↓
+
+IConfigurationEngine.get(
+"api.rateLimit"
+)
+
+↓
+
+Valor retornado
+```
+
+---
+
+Flujo incorrecto:
+
+```
+Motor API
+
+↓
+
+SELECT rateLimit
+FROM configuration_table
+```
+
+---
+
+# 6.3. Espacios de Configuración (Namespaces)
+
+Para evitar conflictos, las configuraciones se agrupan por dominio.
 
 Ejemplo:
 
-```text
-subscribeConfigurationChange(
-    "api.rate_limit"
-)
+```
+system.*
+
+api.*
+
+ia.*
+
+maps.*
+
+audio.*
+
+camera.*
+
+notifications.*
 ```
 
-Cuando cambia la configuración:
+---
 
-```text
-SYSTEM_CONFIG_UPDATED
+Esto permite que cada motor tenga independencia.
+
+---
+
+# 6.4. Versionamiento de Configuración
+
+Toda configuración importante puede poseer versiones.
+
+Ejemplo:
+
+```
+Configuración v1
+
+↓
+
+Configuración v2
 ```
 
-puede ser publicado mediante el Motor de Eventos.
+---
+
+Permite:
+
+- comparar cambios.
+- restaurar versiones anteriores.
+- auditar modificaciones.
 
 ---
 
 # 7. Relación con Otros Motores
 
----
+El Motor Configuración es un servicio transversal del CORE.
 
-# 7.1. Relación con Motor de Nodos
+Su función es entregar parámetros.
 
-El Motor de Configuración administra preferencias asociadas a Nodos.
-
-Pero no administra la existencia del Nodo.
-
-Ejemplo:
-
-Motor Nodos:
-
-```text
-Node {
- id,
- type,
- relationships
-}
-```
-
-Motor Configuración:
-
-```text
-Node Preferences {
- theme,
- language,
- notifications
-}
-```
+No interpreta reglas de otros motores.
 
 ---
 
-# 7.2. Relación con Motor API
+# 7.1. Relación con Motor API
 
-El Motor API consume configuración para:
+El Motor API utiliza configuración para operar correctamente.
 
-- Límites.
-- Versiones activas.
-- Políticas operativas.
-- Parámetros de seguridad.
+Ejemplos:
 
-Ejemplo:
-
-```text
-api.rate_limit = 1000/min
 ```
+api.timeout
 
-El Motor API aplica la regla.
+api.rateLimit
 
-El Motor Configuración solamente la entrega.
+api.corsPolicy
+```
 
 ---
-
-# 7.3. Relación con Motor Eventos
-
-Cuando una configuración cambia, el sistema puede comunicarlo mediante eventos.
-
-Ejemplo:
-
-```text
-SYSTEM_CONFIG_UPDATED
-```
 
 Flujo:
 
 ```
-Cambio configuración
+Motor API
 
 ↓
 
@@ -508,381 +711,612 @@ Motor Configuración
 
 ↓
 
-Motor Eventos
-
-↓
-
-Motores interesados
+Parámetros operativos
 ```
 
 ---
 
-# 7.4. Relación con Motor Base de Datos
-
-El Motor de Base de Datos proporciona persistencia.
-
-El Motor Configuración define el significado funcional de los parámetros.
-
-Separación:
-
-```
-Motor Configuración
-
-"Qué significa esta configuración"
-
-          ↓
-
-Motor Base Datos
-
-"Cómo almacenarla"
-```
-
----
-
-# 8. Separación con Motor Secretos
-
-El Motor de Configuración nunca debe almacenar información sensible.
-
-Incorrecto:
-
-```text
-openai.api_key
-
-database.password
-
-jwt.private_key
-```
-
-Correcto:
-
-```text
-secret.reference = "openai-production-key"
-```
-
-La administración de secretos corresponde a un futuro Motor de Secretos.
-
----
-
-# 9. Principio Fundamental
-
-La configuración controla el comportamiento.
-
-No controla la identidad.
-
-No controla la lógica de negocio.
-
-No controla los permisos.
-
-Cada responsabilidad pertenece al motor correspondiente.
-
----
-
-# 10. Seguridad del Motor de Configuración
-
-La configuración del ecosistema RegulaPro puede modificar el comportamiento operativo del sistema.
-
-Por esta razón, debe estar protegida mediante controles de seguridad adecuados.
-
----
-
-# 10.1. Control de Acceso
-
-Toda operación sobre configuraciones debe validar:
-
-- Identidad del solicitante.
-- Permisos asignados.
-- Alcance permitido.
-- Registro de auditoría.
+El Motor API decide cómo aplicar esos valores.
 
 ---
 
 Ejemplo:
 
-Un administrador puede modificar:
+Configuración:
 
-```text
-system.maintenance_mode
+```
+rateLimit = 100
 ```
 
-Pero un Nodo usuario no puede modificar:
+Motor API:
 
-```text
-api.security_policy
+```
+aplica límite de 100 solicitudes
 ```
 
 ---
 
-# 10.2. Auditoría de Cambios
+El Motor Configuración no bloquea solicitudes.
 
-Toda modificación importante debe registrar:
+---
+
+# 7.2. Relación con Motor Nodos
+
+El Motor Nodos puede consultar configuraciones relacionadas con comportamiento operativo.
+
+Ejemplo:
+
+```text
+node.defaultSettings
+```
+
+---
+
+Pero:
+
+El Motor Configuración no crea Nodos.
+
+No modifica identidad.
+
+No administra relaciones.
+
+---
+
+Responsabilidades:
+
+```
+Motor Nodos
+
+Identidad
+
+
+Motor Configuración
+
+Preferencias
+```
+
+---
+
+# 7.3. Relación con Motor IA
+
+El Motor IA puede consultar:
+
+```
+ia.provider
+
+ia.model
+
+ia.temperature
+```
+
+---
+
+Ejemplo:
+
+```
+Motor IA
+
+↓
+
+¿Qué modelo usar?
+
+↓
+
+Motor Configuración
+```
+
+---
+
+El Motor Configuración no conoce:
+
+- prompts.
+- conversaciones.
+- memoria.
+- razonamiento.
+
+Eso pertenece al Motor IA y Conversaciones.
+
+---
+
+# 7.4. Relación con Motor Secretos
+
+Existe una separación estricta.
+
+Configuración:
+
+```text
+ia.provider = OpenAI
+```
+
+Secretos:
+
+```text
+OPENAI_API_KEY = ********
+```
+
+---
+
+Flujo correcto:
+
+```
+Motor IA
+
+↓
+
+Motor Configuración
+
+¿qué proveedor usar?
+
+
+Motor Secretos
+
+¿cómo autenticarse?
+```
+
+---
+
+Nunca:
+
+```
+Motor Configuración
+
+↓
+
+API Keys
+```
+
+---
+
+**Fin Parte 2**
+
+# 8. Eventos del Motor Configuración
+
+El Motor Configuración participa dentro del ecosistema mediante eventos que permiten que otros motores reaccionen a cambios importantes.
+
+Los eventos comunican que una configuración cambió.
+
+No contienen lógica de negocio.
+
+---
+
+# 8.1. Eventos Emitidos
+
+## CONFIG_UPDATED
+
+Indica que un valor de configuración fue modificado.
+
+Ejemplo:
 
 ```json
 {
- "key": "api.rate_limit",
- "oldValue": 100,
- "newValue": 200,
- "changedBy": "node_admin",
- "timestamp": "2026-07-13"
+ "key": "api.rateLimit",
+ "previousValue": 100,
+ "newValue": 500,
+ "timestamp": "2026-07-13T10:00:00"
 }
+```
+
+Consumidores posibles:
+
+- Motor API.
+- Motor IA.
+- Motor Mapas.
+- Motor Interfaz.
+
+---
+
+## CONFIG_VERSION_CREATED
+
+Indica que existe una nueva versión de configuración.
+
+Ejemplo:
+
+```text
+CONFIG_VERSION_CREATED
+
+version: 2.0
+```
+
+---
+
+## CONFIG_ROLLBACK_COMPLETED
+
+Indica que una configuración fue restaurada a una versión anterior.
+
+Ejemplo:
+
+```text
+CONFIG_ROLLBACK_COMPLETED
+
+from: v3
+
+to: v2
+```
+
+---
+
+# 8.2. Eventos Consumidos
+
+El Motor Configuración puede escuchar eventos relacionados con cambios del ecosistema.
+
+---
+
+## SYSTEM_INITIALIZED
+
+Emitido durante el inicio del sistema.
+
+Permite cargar:
+
+- configuración inicial.
+- valores por defecto.
+- parámetros del entorno.
+
+---
+
+## ENVIRONMENT_CHANGED
+
+Indica cambio de entorno.
+
+Ejemplo:
+
+```
+development
+
+↓
+
+production
+```
+
+---
+
+## MOTOR_REGISTERED
+
+Indica que un nuevo motor fue incorporado al CORE.
+
+Permite crear su espacio inicial:
+
+Ejemplo:
+
+```
+new.motor.*
+
+```
+
+---
+
+# 9. Seguridad e Integridad
+
+El Motor Configuración administra información crítica para el funcionamiento del ecosistema.
+
+Por esta razón debe operar bajo controles estrictos.
+
+---
+
+# 9.1. Control de Acceso
+
+Cada modificación debe validar:
+
+- identidad del solicitante.
+- motor responsable.
+- permisos asignados.
+- alcance permitido.
+
+---
+
+Ejemplo:
+
+Permitido:
+
+```
+Motor API
+
+modificar
+
+api.rateLimit
+```
+
+No permitido:
+
+```
+Motor API
+
+modificar
+
+ia.model
+```
+
+salvo autorización explícita.
+
+---
+
+# 9.2. Auditoría
+
+Toda modificación debe generar registro.
+
+Ejemplo:
+
+```
+CONFIG_UPDATED
+
+usuario: admin
+
+motor: API
+
+campo: api.timeout
+
+fecha: timestamp
 ```
 
 ---
 
 La auditoría permite:
 
-- Saber quién modificó una configuración.
-- Recuperar estados anteriores.
-- Investigar comportamientos inesperados.
+- rastrear cambios.
+- detectar errores.
+- recuperar configuraciones anteriores.
 
 ---
 
-# 10.3. Validación
+# 9.3. Protección contra Configuraciones Peligrosas
 
-Antes de aplicar una configuración se debe validar:
-
-- Tipo de dato.
-- Rango permitido.
-- Compatibilidad.
-- Dependencias.
+El Motor Configuración debe impedir valores incompatibles.
 
 Ejemplo:
 
 Incorrecto:
 
-```text
+```
 api.timeout = -500
 ```
 
 Correcto:
 
-```text
-api.timeout = 30000
+```
+api.timeout = 30
 ```
 
 ---
 
-# 11. Eventos del Motor de Configuración
-
-El Motor de Configuración participa en el ecosistema de eventos.
+La validación protege la estabilidad del ecosistema.
 
 ---
 
-# 11.1. Eventos Emitidos
+# 10. Persistencia
 
-## SYSTEM_CONFIG_UPDATED
+El Motor Configuración utiliza el Motor de Base de Datos para almacenar configuraciones permanentes.
 
-Descripción:
+---
 
-Una configuración global fue modificada.
+Flujo:
 
-Payload:
+```
+Motor Configuración
 
-```json
-{
- "key": "api.rate_limit",
- "version": "2.0",
- "timestamp": "2026-07-13"
-}
+↓
+
+Motor Base Datos
+
+↓
+
+Persistencia física
 ```
 
 ---
 
-## NODE_CONFIG_UPDATED
+Nunca:
 
-Descripción:
+```
+Motor Configuración
 
-Las preferencias de un Nodo fueron modificadas.
+↓
 
-Payload:
-
-```json
-{
- "nodeId": "123",
- "key": "theme"
-}
+Tablas directas
 ```
 
 ---
 
-## CONFIG_VALIDATION_FAILED
-
-Descripción:
-
-Una configuración intentó ser aplicada pero no cumplía las reglas.
-
----
-
-# 11.2. Eventos Consumidos
-
-El Motor Configuración puede consumir:
+Ejemplo conceptual:
 
 ```text
-SYSTEM_STARTED
-```
+configuration_entry
 
-para cargar configuración inicial.
+id
 
-```text
-MOTOR_REGISTERED
-```
+namespace
 
-para conocer nuevos consumidores.
+key
 
----
+value
 
-# 12. Evolución del Motor Configuración
+version
 
-El Motor de Configuración debe evolucionar sin afectar los motores consumidores.
-
----
-
-# 12.1. Versionamiento
-
-Cada configuración posee versión independiente.
-
-Ejemplo:
-
-```text
-api.timeout v1
-
-api.timeout v2
+updatedAt
 ```
 
 ---
 
-Los cambios incompatibles requieren migración.
+La estructura física pertenece al Motor Base de Datos.
 
 ---
 
-# 12.2. Migración Tecnológica
+# 11. Evolución Tecnológica
 
-El almacenamiento interno puede cambiar:
+El Motor Configuración debe poder evolucionar sin afectar al resto del CORE.
 
-```text
+---
+
+Puede cambiar:
+
+```
 Archivo JSON
 
 ↓
 
-Base SQL
+Base Datos
 
 ↓
 
-Sistema distribuido
-```
+Servicio distribuido
 
-Los motores consumidores no deben modificarse.
+↓
+
+Sistema externo
+```
 
 ---
 
-# 12.3. Nuevos Motores
+Mientras mantenga:
 
-Cuando aparezca un nuevo motor del CORE:
-
-Ejemplo:
-
-```text
-Motor Cámara
+```
+IConfigurationEngine
 ```
 
-puede solicitar configuraciones propias:
+los demás motores permanecen independientes.
 
-```text
-camera.resolution
+---
 
-camera.storage_limit
+# 12. Ubicación dentro de la Arquitectura CORE
+
+El Motor Configuración pertenece a los motores fundamentales del ecosistema.
+
+Su función es transversal.
+
+---
+
+Representación:
+
+```
+                 FRONTEND
+
+                    │
+
+                    ▼
+
+               MOTOR API
+
+                    │
+
+                    ▼
+
+              MOTORES DEL CORE
+
+
+        ┌───────────┼───────────┐
+
+        ▼           ▼           ▼
+
+     Nodos        IA        Servicios
+
+                    │
+
+                    ▼
+
+          MOTOR CONFIGURACIÓN
+
+                    │
+
+                    ▼
+
+          MOTOR BASE DATOS
 ```
 
-sin modificar el Motor Configuración.
+---
+
+El Motor Configuración no controla los motores.
+
+Los asiste entregando parámetros.
 
 ---
 
 # 13. Principios Específicos del Motor Configuración
 
-## 13.1. El código define capacidades
+## 13.1. La configuración debe ser reemplazable
 
-La configuración define comportamiento.
+Los valores pueden cambiar.
 
----
-
-## 13.2. Toda configuración debe tener dueño
-
-Cada parámetro debe pertenecer a:
-
-- Un motor.
-- Un dominio.
-- Una responsabilidad.
+Los contratos permanecen.
 
 ---
 
-## 13.3. Configuración explícita
+## 13.2. Configurar no significa decidir
 
-Los parámetros importantes deben existir formalmente.
+El Motor Configuración entrega información.
 
-No deben esconderse dentro del código.
-
----
-
-## 13.4. Cambios controlados
-
-Modificar configuración equivale a modificar comportamiento del sistema.
-
-Debe tratarse como una operación importante.
+Los motores toman decisiones.
 
 ---
 
-# 14. Ubicación dentro del CORE
+## 13.3. Los secretos no son configuración
 
-El Motor de Configuración pertenece a los motores fundamentales.
-
-Su posición conceptual:
+Toda credencial pertenece al:
 
 ```
-                 CORE REGULAPRO
-
-                     
-
-              MOTOR CONFIGURACIÓN
-
-                     │
-
-     ┌───────────────┼───────────────┐
-
-     ▼               ▼               ▼
-
-  Motor API      Motor IA       Motor Nodos
-
-                     │
-
-                     ▼
-
-             Motor Base Datos
+Motor Secretos
 ```
 
-Todos los motores pueden consumir configuración.
+---
 
-Ningún motor debe crear su propio sistema paralelo de configuración.
+## 13.4. Cada motor administra su significado
+
+El Motor Configuración almacena:
+
+```
+api.timeout
+```
+
+pero no sabe qué significa internamente.
+
+---
+
+## 13.5. Todo cambio importante debe quedar registrado
+
+La evolución del sistema requiere memoria de sus decisiones.
+
+---
+
+# 14. Relación con la Filosofía del CORE
+
+Dentro de RegulaPro:
+
+El Motor Nodos representa identidad.
+
+El Motor API representa comunicación.
+
+El Motor Eventos representa coordinación.
+
+El Motor Base Datos representa memoria.
+
+El Motor Configuración representa adaptación.
+
+---
+
+Permite que el ecosistema cambie sin perder estabilidad.
 
 ---
 
 # 15. Conclusión
 
-El Motor de Configuración proporciona flexibilidad controlada al ecosistema RegulaPro.
+El Motor Configuración permite que RegulaPro evolucione dinámicamente sin depender de modificaciones constantes del código.
 
-Permite evolucionar comportamiento sin alterar la arquitectura fundamental.
+Su función no es pensar.
 
-Su responsabilidad es administrar parámetros.
+Su función no es decidir.
 
-No administra identidad.
+Su función es proporcionar el contexto operativo necesario para que los motores especializados funcionen correctamente.
 
-No administra secretos.
+La arquitectura permanece estable porque:
 
-No administra lógica.
+```
+Tecnología cambia.
 
-No administra permisos.
+Configuración cambia.
 
-Cada responsabilidad permanece dentro del motor correspondiente.
+Motores evolucionan.
 
-La configuración permite que RegulaPro cambie sin perder estabilidad.
+Contratos permanecen.
+```
+
+El Motor Configuración garantiza que el CORE pueda adaptarse al futuro sin perder coherencia.
 
 ---
 
