@@ -250,40 +250,64 @@ Nunca mediante dependencias internas.
 El siguiente esquema representa la organización general del CORE.
 
 ```text
-                                      CONSTITUCIÓN
-                          │
-                          ▼
-                 ARQUITECTURA GENERAL
-                          │
-                          ▼
-                     REGULAPRO CORE
-                          │
-      ┌───────────────────┼────────────────────┐
-      │                   │                    │
-      ▼                   ▼                    ▼
- Motor Nodos         Motor API          Motor Eventos
-      │                   │                    │
-      │                   │                    │
-      ▼                   ▼                    ▼
- Motor BD          Motores Especializados   Eventos
-      │
-      │
-      ├──────────────┬───────────────┐
-      ▼              ▼               ▼
-Configuración   Inteligencia     Servicios
-                    │
-                    │
-          ┌─────────┼─────────┐
-          ▼         ▼         ▼
-        IA   Conversaciones  Multimedia
+                                                                                         CONSTITUCIÓN
+                                                                    │
+                                                                    ▼
+                                                        ARQUITECTURA GENERAL
+                                                                    │
+                                                                    ▼
+                                                             REGULAPRO CORE
 
-                     │
-                     ▼
 
-              Motor Interfaz
-                     │
-                     ▼
-                  Usuarios
+                                                                    │
+
+        ┌───────────────────────────┬──────────────────────────────┐
+
+        ▼                           ▼                              ▼
+
+   MOTOR NODOS              MOTORES ESPECIALIZADOS          MOTOR API
+
+
+        │                           │                              │
+
+
+        └───────────────────────────┼──────────────────────────────┘
+
+                                    │
+
+
+                         ┌──────────┼──────────┐
+
+                         ▼          ▼          ▼
+
+
+                 MOTOR EVENTOS  MOTOR CONFIGURACIÓN  MOTOR SECRETOS
+
+
+
+                                    │
+
+
+                                    ▼
+
+
+                            MOTOR BASE DATOS
+
+                         (Persistencia del CORE)
+
+La experiencia de usuario se conecta mediante:
+
+USUARIO
+   │
+   ▼
+MOTOR INTERFAZ
+   │
+   ▼
+MOTOR API
+   │
+   ▼
+REGULAPRO CORE
+
 ```
 
 Este esquema representa relaciones arquitectónicas.
