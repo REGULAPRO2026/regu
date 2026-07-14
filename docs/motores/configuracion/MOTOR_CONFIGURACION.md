@@ -38,7 +38,7 @@ Su misión es permitir que el comportamiento operativo del sistema pueda evoluci
 
 ---
 
-El Motor Configuración actúa como la memoria operativa del sistema.
+El Motor Configuración actúa como contexto operativo del sistema del sistema.
 
 Mientras:
 
@@ -499,6 +499,8 @@ Motor Configuración
 ¿Cómo prefiere funcionar?
 ```
 
+Las preferencias asociadas a un Nodo pueden ser almacenadas mediante el Motor Configuración cuando correspondan a comportamiento operativo del sistema. Los atributos propios del Nodo pertenecen exclusivamente al Motor Nodos.
+
 ---
 
 # 5.4. Configuración Temporal
@@ -673,6 +675,34 @@ Permite:
 - auditar modificaciones.
 
 ---
+
+# 6.5. Contrato de Eventos
+
+El Motor Configuración comunica cambios relevantes mediante eventos públicos del ecosistema.
+
+Los demás motores no consultan internamente el estado del Motor Configuración.
+
+La comunicación ocurre mediante contratos de eventos definidos.
+
+Ejemplo:
+
+CONFIG_UPDATED
+
+Entrada:
+
+{
+ key,
+ version,
+ timestamp
+}
+
+Consumidores:
+
+- Motor API
+- Motor IA
+- Motor Interfaz
+
+El formato del evento pertenece al contrato público del Motor Eventos.
 
 # 7. Relación con Otros Motores
 
@@ -1038,7 +1068,7 @@ Ejemplo:
 ```
 CONFIG_UPDATED
 
-usuario: admin
+actor: nodo autorizado
 
 motor: API
 
@@ -1198,24 +1228,29 @@ Representación:
 
                     ▼
 
+                                  MOTOR API
+
+                        │
+
+                        ▼
+
               MOTORES DEL CORE
 
 
-        ┌───────────┼───────────┐
+ ┌──────────────┬──────────────┬──────────────┐
 
-        ▼           ▼           ▼
+ ▼              ▼              ▼
 
-     Nodos        IA        Servicios
+Nodos        IA          Servicios
 
-                    │
 
-                    ▼
+        ╲        │        ╱
 
           MOTOR CONFIGURACIÓN
 
-                    │
+                 │
 
-                    ▼
+                 ▼
 
           MOTOR BASE DATOS
 ```
