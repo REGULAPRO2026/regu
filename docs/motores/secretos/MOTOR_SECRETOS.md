@@ -510,6 +510,25 @@ Todos los accesos posteriores bloqueados
 
 ---
 
+## 6.2. Contrato de Migraciones
+
+IMigrationManager
+
+Responsabilidad:
+
+Gestionar evolución controlada del modelo interno.
+
+Capacidades:
+
+```text
+createMigration()
+
+executeMigration()
+
+rollbackMigration()
+
+getVersion()
+
 # 7. Relaciones con otros Motores
 
 El Motor de Secretos funciona como un servicio transversal del CORE.
