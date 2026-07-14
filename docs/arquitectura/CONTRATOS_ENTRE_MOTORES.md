@@ -518,40 +518,40 @@ Motor encargado de proteger información sensible.
 La arquitectura oficial queda:
 
 ```
-                                     CONTRATOS PÚBLICOS
+                                                      CONTRATOS PÚBLICOS ENTRE MOTORES
 
 
-              IAPIEngine
-                   │
+                    IContratoAPI
+                         │
 
-        ┌──────────┼──────────┐
+          ┌──────────────┼──────────────┐
 
-        ▼          ▼          ▼
+          ▼              ▼              ▼
 
- INodeEngine   IAIEngine   IMediaEngine
-
-
-        │          │          │
-
-        └──────────┼──────────┘
-
-                   ▼
-
-              IEventBus
+   IContratoNodo   IContratoIA   IContratoMultimedia
 
 
-        ┌──────────┴──────────┐
+          │              │              │
 
-        ▼                     ▼
+          └──────────────┼──────────────┘
 
-IConfigurationEngine   ISecretsManager
+                         ▼
+
+                 IContratoEventos
 
 
-                   │
+          ┌──────────────┴──────────────┐
 
-                   ▼
+          ▼                             ▼
 
-              IDataStore
+ IContratoConfiguración        IContratoSecretos
+
+
+                         │
+
+                         ▼
+
+              IContratoPersistencia
 
 
 ```
