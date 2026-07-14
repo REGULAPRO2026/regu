@@ -189,8 +189,8 @@ Motor de Nodos            ✅ Formalizado
 Motor API                 ✅ Formalizado
 Motor Eventos             ✅ Formalizado
 Motor Base de Datos       ✅ Formalizado
-Motor Configuración       ⏳ Pendiente
-Motor Secretos            ⏳ Propuesto
+Motor Configuración       ✅ Formalizado
+Motor Secretos            ✅ Formalizado
 ...
 
 ---
@@ -250,7 +250,7 @@ Nunca mediante dependencias internas.
 El siguiente esquema representa la organización general del CORE.
 
 ```text
-                         REGULAPRO CORE
+                        REGULAPRO CORE
 
 
                               │
@@ -260,38 +260,47 @@ El siguiente esquema representa la organización general del CORE.
 
         ▼                     ▼                     ▼
 
+
    MOTOR NODOS            MOTOR API          MOTOR EVENTOS
 
 
                               │
 
+                              ▼
+
+
+              ┌─────────────────────────┐
+
+              │                         │
+
+              ▼                         ▼
+
+
+      MOTORES DE INTELIGENCIA      MOTORES DE SERVICIOS
+
+
+              │                         │
+
+       ┌──────┴──────┐          ┌──────┼──────┬──────┐
+
+       ▼             ▼          ▼      ▼      ▼      ▼
+
+
+      IA    CONVERSACIONES  MULTIMEDIA AUDIO CÁMARA MAPAS
+
+
+                              │
 
                               ▼
 
 
-                  MOTORES DE DOMINIO
+                 MOTORES TRANSVERSALES
 
 
               ┌──────────────┼──────────────┐
 
               ▼              ▼              ▼
 
-             IA       Conversaciones    Multimedia
-
-
-
-                              │
-
-
-                              ▼
-
-
-              MOTORES TRANSVERSALES
-
-
-              ┌──────────────┬──────────────┐
-
-              ▼              ▼              ▼
 
        CONFIGURACIÓN     SECRETOS     BASE DATOS
 
@@ -322,6 +331,10 @@ La persistencia, configuración, seguridad y comunicación
 son capacidades transversales del CORE.
 
 No representan jerarquía ni dependencia directa.
+
+Comunicación = Motor Eventos
+
+El Motor Eventos actúa como mecanismo transversal de coordinación entre motores mediante comunicación asíncrona basada en eventos.
 
 ---
 
@@ -377,7 +390,7 @@ Compuesta por los motores especializados del ecosistema.
 
 Aquí residen las capacidades permanentes de RegulaPro.
 
-Incluye los motores responsables de identidad, inteligencia, servicios y experiencia.
+Incluye los motores responsables de identidad, inteligencia y servicios especializados del CORE.
 
 La lógica permanente del sistema pertenece a los motores correspondientes, no a una capa genérica de negocio.
 
