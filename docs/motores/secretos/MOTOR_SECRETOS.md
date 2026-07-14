@@ -421,7 +421,7 @@ Entrada conceptual:
 ```json
 {
  "name": "provider-ai-key",
- "owner": "motor_ia",
+ "ownerReference": "motor_ia",
  "scope": "external_service"
 }
 ```
@@ -518,16 +518,21 @@ Responsabilidad:
 
 Gestionar evolución controlada del modelo interno.
 
-Capacidades:
+## 6.3 Contrato de Eventos
 
-```text
-createMigration()
+El Motor Secretos comunica cambios mediante eventos públicos administrados por el Motor Eventos.
 
-executeMigration()
+Ejemplos:
 
-rollbackMigration()
+SECRET_ROTATED
 
-getVersion()
+SECRET_REVOKED
+
+SECRET_ACCESS_DENIED
+
+Los eventos informan hechos ocurridos.
+
+No entregan valores sensibles.
 
 # 7. Relaciones con otros Motores
 
@@ -750,15 +755,15 @@ Toda solicitud debe seguir:
 ```
 Motor solicitante
 
-        |
+↓
 
-        v
+Motor API
 
-Motor API / Seguridad
+↓
 
-        |
+Validación de autorización
 
-        v
+↓
 
 Motor Secretos
 
@@ -1135,32 +1140,30 @@ Arquitectura:
                  CORE REGULAPRO
 
 
-              Motor API
+                MOTOR API
 
-                  |
+                    │
 
-                  |
+        ┌───────────┴───────────┐
 
-        +---------+---------+
+        │                       │
 
-        |                   |
+ MOTOR SECRETOS          MOTOR EVENTOS
 
- Motor Secretos        Motor Eventos
+        │
 
-        |
+        │
 
-        |
-
- Motor Base Datos
+ MOTOR BASE DATOS
 
 
-        |
+        │
 
-        |
+        │
 
- Motores Especializados
+ MOTORES ESPECIALIZADOS
 
- (IA, Multimedia, Mapas, Audio)
+ IA - MAPAS - AUDIO - ETC
 
 ```
 
