@@ -604,7 +604,7 @@ Ejemplos de información que requieren protección especial:
 - Claves privadas.
 - Información personal sensible.
 
-Estos elementos deberán gestionarse mediante el futuro Motor de Secretos.
+Estos elementos deberán gestionarse mediante el Motor de Secretos.
 
 ---
 
