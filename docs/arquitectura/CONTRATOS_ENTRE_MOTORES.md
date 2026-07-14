@@ -293,7 +293,7 @@ El CORE RegulaPro está compuesto inicialmente por:
 | Motor Eventos | Fundamental | Formalizado |
 | Motor Base de Datos | Fundamental | Formalizado |
 | Motor Configuración | Fundamental | Formalizado |
-| Motor Secretos | Fundamental | Propuesto |
+| Motor Secretos | Fundamental | Formalizado |
 | Motor IA | Inteligencia | Pendiente |
 | Motor Conversaciones | Inteligencia | Pendiente |
 | Motor Multimedia | Servicios | Pendiente |
@@ -424,7 +424,7 @@ El Motor Base Datos es el único responsable de persistencia.
 | Motor | Motivo |
 |---|---|
 | Infraestructura | Recursos técnicos |
-| Seguridad | Control de acceso |
+| Servicios de infraestructura segura | Control de acceso |
 
 ---
 
@@ -481,7 +481,7 @@ Administra parámetros modificables del ecosistema.
 
 ---
 
-# 6.6. Motor Secretos (Propuesto)
+# 6.6. Motor Secretos (Formalizado)
 
 Motor encargado de proteger información sensible.
 
@@ -518,39 +518,40 @@ Motor encargado de proteger información sensible.
 La arquitectura oficial queda:
 
 ```
-                 FRONTEND
+                                     CONTRATOS PÚBLICOS
 
-                    |
 
-                    v
+              IAPIEngine
+                   │
 
-              MOTOR API
+        ┌──────────┼──────────┐
 
-                    |
+        ▼          ▼          ▼
 
-     +--------------+--------------+
+ INodeEngine   IAIEngine   IMediaEngine
 
-     |              |              |
 
-     v              v              v
+        │          │          │
 
- MOTOR NODOS     MOTOR IA     MOTOR SERVICIOS
+        └──────────┼──────────┘
 
-     |
+                   ▼
 
-     |
+              IEventBus
 
-     v
 
- MOTOR EVENTOS
+        ┌──────────┴──────────┐
 
-     |
+        ▼                     ▼
 
-     |
+IConfigurationEngine   ISecretsManager
 
-     v
 
- MOTOR BASE DATOS
+                   │
+
+                   ▼
+
+              IDataStore
 
 
 ```
@@ -620,6 +621,11 @@ Persistencia
 
 Infraestructura
 ```
+
+Los motores transversales
+(Configuración, Secretos y Eventos)
+pueden ser utilizados por múltiples capas,
+pero no contienen lógica de dominio.
 
 Un motor inferior nunca debe depender de uno superior.
 
@@ -779,6 +785,13 @@ Motor Eventos
 
 Motores interesados
 ```
+Todos los motores que generen eventos deben definir:
+
+- nombre del evento
+- versión
+- payload
+- consumidores esperados
+- política de compatibilidad
 
 ---
 
@@ -844,6 +857,24 @@ Garantiza:
 - Configuración centralizada.
 - Versionamiento.
 - Auditoría.
+
+# 8.6 Contrato Motor Secretos
+
+## ISecretsManager
+
+Responsabilidad:
+
+Administrar acceso controlado a información sensible.
+
+Capacidades:
+
+getSecret()
+
+createSecret()
+
+rotateSecret()
+
+revokeSecret()
 
 ---
 
