@@ -171,6 +171,9 @@ Representan los pilares permanentes del ecosistema.
 - Motor Base de Datos
 - Motor Eventos
 - Motor Configuración
+- Motor Secretos
+
+Estos motores permiten la existencia, seguridad y funcionamiento del resto del sistema.
 
 Estos motores permiten la existencia y funcionamiento del resto del sistema.
 
@@ -184,9 +187,10 @@ Toda operación sobre datos del negocio deberá realizarse siempre mediante el m
 
 Motor de Nodos            ✅ Formalizado
 Motor API                 ✅ Formalizado
-Motor Eventos             ⏳ Pendiente
-Motor Base de Datos       ⏳ Pendiente
+Motor Eventos             ✅ Formalizado
+Motor Base de Datos       ✅ Formalizado
 Motor Configuración       ⏳ Pendiente
+Motor Secretos            ⏳ Propuesto
 ...
 
 ---
@@ -246,7 +250,7 @@ Nunca mediante dependencias internas.
 El siguiente esquema representa la organización general del CORE.
 
 ```text
-                   CONSTITUCIÓN
+                                      CONSTITUCIÓN
                           │
                           ▼
                  ARQUITECTURA GENERAL
@@ -257,21 +261,25 @@ El siguiente esquema representa la organización general del CORE.
       ┌───────────────────┼────────────────────┐
       │                   │                    │
       ▼                   ▼                    ▼
- Motor Nodos         Motor API         Motor Eventos
+ Motor Nodos         Motor API          Motor Eventos
       │                   │                    │
-      ├──────────────┬────┴────────────┬───────┤
-      ▼              ▼                 ▼
-Motor BD       Motor Configuración   Motor IA
-      │                                 │
-      ├──────────────┬──────────────────┤
-      ▼              ▼
-Conversaciones   Multimedia
-      │              │
-      ├──────┬───────┴─────────────┐
-      ▼      ▼                     ▼
- Audio   Cámara                Mapas
+      │                   │                    │
+      ▼                   ▼                    ▼
+ Motor BD          Motores Especializados   Eventos
+      │
+      │
+      ├──────────────┬───────────────┐
+      ▼              ▼               ▼
+Configuración   Inteligencia     Servicios
+                    │
+                    │
+          ┌─────────┼─────────┐
+          ▼         ▼         ▼
+        IA   Conversaciones  Multimedia
+
                      │
                      ▼
+
               Motor Interfaz
                      │
                      ▼
@@ -281,6 +289,10 @@ Conversaciones   Multimedia
 Este esquema representa relaciones arquitectónicas.
 
 No representa dependencias de implementación.
+
+El Motor API actúa como frontera externa del CORE, pero nunca accede directamente a datos de negocio.
+
+Cada motor utiliza únicamente los contratos públicos definidos por los demás motores.
 
 ---
 
@@ -330,13 +342,15 @@ Toda solicitud debe atravesar esta capa.
 
 ---
 
-## Capa de Negocio
+## Capa de Motores del CORE
 
-Compuesta por los motores especializados.
+Compuesta por los motores especializados del ecosistema.
 
-Aquí residen las reglas permanentes del ecosistema.
+Aquí residen las capacidades permanentes de RegulaPro.
 
-Esta capa constituye el verdadero corazón funcional de RegulaPro.
+Incluye los motores responsables de identidad, inteligencia, servicios y experiencia.
+
+La lógica permanente del sistema pertenece a los motores correspondientes, no a una capa genérica de negocio.
 
 ---
 
@@ -375,6 +389,14 @@ Podrán reemplazarse lenguajes de programación, bases de datos, frameworks, ser
 La arquitectura constituye el contrato estable del ecosistema.
 
 La tecnología constituye únicamente su implementación temporal.
+
+---
+
+## Definición Oficial
+
+La Independencia Tecnológica establece que RegulaPro no depende de ningún lenguaje, framework, plataforma cloud, proveedor de base de datos o modelo de inteligencia artificial específico.
+
+Toda tecnología puede ser reemplazada mientras respete los contratos públicos definidos por el CORE.
 
 ---
 
@@ -443,7 +465,7 @@ CONSTITUCIÓN
 ARQUITECTURA GENERAL
       │
       ▼
-MOTORES DEL CORE
+ESPECIFICACIONES DE MOTORES DEL CORE
       │
       ▼
 IMPLEMENTACIÓN
@@ -457,6 +479,25 @@ Cada nivel desarrolla al anterior.
 Ningún nivel inferior puede contradecir los principios establecidos por un nivel superior.
 
 Esta organización garantiza la estabilidad conceptual del proyecto independientemente de su evolución tecnológica.
+
+---
+
+# 17.1. Contratos entre Motores
+
+La comunicación entre motores se encuentra definida mediante contratos públicos independientes.
+
+Estos contratos establecen:
+
+- Capacidades disponibles.
+- Datos de entrada.
+- Datos de salida.
+- Eventos emitidos.
+- Eventos consumidos.
+- Versionamiento.
+
+Ningún motor debe depender de detalles internos de otro motor.
+
+Los contratos representan la frontera estable del ecosistema.
 
 ---
 
