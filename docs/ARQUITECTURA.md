@@ -250,50 +250,50 @@ Nunca mediante dependencias internas.
 El siguiente esquema representa la organización general del CORE.
 
 ```text
-                                                                                         CONSTITUCIÓN
-                                                                    │
-                                                                    ▼
-                                                        ARQUITECTURA GENERAL
-                                                                    │
-                                                                    ▼
-                                                             REGULAPRO CORE
+                         REGULAPRO CORE
 
 
-                                                                    │
-
-        ┌───────────────────────────┬──────────────────────────────┐
-
-        ▼                           ▼                              ▼
-
-   MOTOR NODOS              MOTORES ESPECIALIZADOS          MOTOR API
+                              │
 
 
-        │                           │                              │
+        ┌─────────────────────┼─────────────────────┐
+
+        ▼                     ▼                     ▼
+
+   MOTOR NODOS            MOTOR API          MOTOR EVENTOS
 
 
-        └───────────────────────────┼──────────────────────────────┘
-
-                                    │
+                              │
 
 
-                         ┌──────────┼──────────┐
-
-                         ▼          ▼          ▼
+                              ▼
 
 
-                 MOTOR EVENTOS  MOTOR CONFIGURACIÓN  MOTOR SECRETOS
+                  MOTORES DE DOMINIO
+
+
+              ┌──────────────┼──────────────┐
+
+              ▼              ▼              ▼
+
+             IA       Conversaciones    Multimedia
 
 
 
-                                    │
+                              │
 
 
-                                    ▼
+                              ▼
 
 
-                            MOTOR BASE DATOS
+              MOTORES TRANSVERSALES
 
-                         (Persistencia del CORE)
+
+              ┌──────────────┬──────────────┐
+
+              ▼              ▼              ▼
+
+       CONFIGURACIÓN     SECRETOS     BASE DATOS
 
 La experiencia de usuario se conecta mediante:
 
@@ -317,6 +317,11 @@ No representa dependencias de implementación.
 El Motor API actúa como frontera externa del CORE, pero nunca accede directamente a datos de negocio.
 
 Cada motor utiliza únicamente los contratos públicos definidos por los demás motores.
+
+La persistencia, configuración, seguridad y comunicación
+son capacidades transversales del CORE.
+
+No representan jerarquía ni dependencia directa.
 
 ---
 
