@@ -1,1275 +1,440 @@
 ---
-title: Motor de Secretos
+title: Motor Secretos
 version: 1.0.0
-status: PROPUESTA
+status: DOCUMENTO FUNDACIONAL
 date: Julio 2026
 author: Rodrigo Macias
 architecture: RegulaPro CORE
 document: Especificación Arquitectónica
+revision: VERSIÓN FINAL AUDITADA
 ---
 
-# Motor de Secretos
+# Motor Secretos
 
 ## Especificación Arquitectónica
 
-Versión 1.0
+### Versión Definitiva Auditada v1.0.0
 
 ---
 
-# Índice
+## Índice
 
-1. Misión y Alcance
-2. Responsabilidades
-3. Límites del Motor
-4. Principios de Seguridad
-5. Modelo de Secretos
-6. Tipos de Secretos
-7. Relación con otros Motores
+1. Introducción
+2. Misión Permanente
+3. Alcance
+4. Filosofía del Motor
+5. Principios Arquitectónicos
+6. Responsabilidad Única
+7. Responsabilidades
+8. Modelo Conceptual de Secreto
+9. Ciclo de Vida del Secreto
+10. Límites del Motor
+11. Relación con los demás Motores
+12. Flujo de Autorización y Entrega
+13. Eventos del Motor Secretos
+14. Auditoría y Trazabilidad
+15. Independencia Tecnológica
+16. Ubicación dentro del CORE
+17. Principios Permanentes
+18. Conclusión
 
 ---
 
-# 1. Misión y Alcance
+## 1. Introducción
 
-## Misión
+Esta especificación describe la naturaleza arquitectónica del Motor Secretos, su responsabilidad exclusiva, el modelo conceptual que administra y su relación con el resto de los motores del CORE de RegulaPro.
 
-El Motor de Secretos es el componente responsable de administrar, proteger y proporcionar acceso controlado a información sensible dentro del ecosistema RegulaPro.
-
-Su misión es garantizar que credenciales, claves privadas y elementos de autenticación permanezcan separados del código, la configuración general y la lógica de negocio.
+Este documento no describe el contrato público del motor, el cual existe como documento independiente, ni describe ninguna tecnología, algoritmo o proveedor concreto de custodia. Describe únicamente la responsabilidad permanente que el Motor Secretos sostiene dentro del ecosistema.
 
 ---
 
-## Alcance
+## 2. Misión Permanente
 
-El Motor de Secretos administra:
+El Motor Secretos es el componente del CORE responsable de custodiar la información sensible del ecosistema y de entregarla de forma controlada, exclusivamente cuando existe una decisión de autorización previa y verificable, emitida por el Motor Seguridad.
 
-- Claves API.
-- Tokens de autenticación.
-- Certificados.
-- Credenciales de proveedores externos.
+Su misión es garantizar que las credenciales, claves y demás elementos sensibles permanezcan separados del código, de la configuración operativa y de la lógica de negocio, sin que el propio motor decida jamás quién puede acceder a ellos.
+
+> El Motor Seguridad decide.
+> El Motor Secretos custodia y entrega.
+
+---
+
+## 3. Alcance
+
+El Motor Secretos administra, en el nivel conceptual, categorías de información sensible tales como:
+
+- Credenciales de acceso a servicios externos.
 - Claves criptográficas.
-- Información sensible requerida por otros motores.
+- Certificados.
+- Tokens de autenticación y de acceso.
+- Cualquier otro elemento sensible que un motor del CORE requiera para operar.
+
+El motor no distingue estas categorías por su origen tecnológico, sino por su naturaleza conceptual: información cuya divulgación no autorizada comprometería al ecosistema.
 
 ---
 
-El Motor de Secretos actúa como una bóveda de seguridad del ecosistema.
+## 4. Filosofía del Motor
 
-Su responsabilidad es:
+El Motor Secretos actúa como la instancia única de custodia del CORE. Su existencia responde a un principio simple: ninguna credencial debe residir en el código, en la configuración general ni en la lógica de negocio de ningún motor.
 
-```
-Guardar
+El motor no es un almacenamiento general de datos, ni un sistema de configuración, ni una autoridad de decisión. Es exclusivamente el guardián de la información sensible, y entrega dicha información solo cuando el Motor Seguridad ha decidido previamente que el acceso es legítimo.
 
-Proteger
-
-Autorizar acceso
-
-Auditar uso
-```
+La custodia nunca implica propiedad. El Motor Secretos protege la información en nombre de los motores que la necesitan, sin apropiarse conceptualmente de ella ni de su significado funcional.
 
 ---
 
-# 2. Responsabilidades
+## 5. Principios Arquitectónicos
 
-El Motor de Secretos posee las siguientes responsabilidades:
+### 5.1. Principio de Mínimo Acceso
 
----
+Cada motor consumidor solo puede acceder a los secretos estrictamente necesarios para su propia responsabilidad, y únicamente durante el tiempo requerido.
 
-# 2.1. Almacenamiento Seguro
+### 5.2. Principio de Separación
 
-Mantener información sensible utilizando mecanismos adecuados de protección.
+Los secretos permanecen siempre separados de:
 
-Los secretos nunca deben almacenarse como texto plano cuando requieran protección criptográfica.
+- El código de cualquier motor.
+- La configuración operativa administrada por el Motor Configuración.
+- Los datos de negocio administrados por el Motor Persistencia.
+- Cualquier interfaz de experiencia o cliente externo al CORE.
 
----
+### 5.3. Principio de Sustitución Tecnológica
 
-Ejemplo:
+El mecanismo utilizado para custodiar secretos es completamente reemplazable. El contrato y las garantías del motor permanecen estables con independencia de la técnica de protección empleada, presente o futura.
 
-Incorrecto:
+### 5.4. Principio de Nunca Exponer
 
-```text
-OPENAI_KEY=sk-123456
-```
+Un secreto nunca aparece, bajo ninguna circunstancia, en interfaces de experiencia, registros de auditoría, eventos generales o respuestas no autorizadas. Lo que se audita es el hecho de su uso, nunca su valor.
 
-Correcto:
+### 5.5. Principio de Custodia sin Propiedad
 
-```text
-secret_reference=openai-production-key
-```
-
----
-
-# 2.2. Control de Acceso
-
-Determinar qué motor o servicio puede solicitar un secreto específico.
-
-Ejemplo:
-
-Permitido:
-
-```
-Motor IA
-
-↓
-
-Solicitar clave proveedor IA
-```
-
-No permitido:
-
-```
-Motor Multimedia
-
-↓
-
-Solicitar clave proveedor IA
-```
+Ningún motor, incluido el propio Motor Secretos, es dueño de la información sensible que custodia. La custodia es una responsabilidad de protección y entrega controlada, no un título de propiedad sobre el contenido del secreto.
 
 ---
 
-# 2.3. Gestión del Ciclo de Vida
+## 6. Responsabilidad Única
 
-Administrar todo el ciclo de un secreto:
+La responsabilidad única del Motor Secretos es:
+
+> Registrar, proteger, rotar, revocar y entregar información sensible en nombre de los motores del CORE, condicionando toda entrega a la existencia de una decisión de autorización previa, emitida por el Motor Seguridad.
+
+Esta responsabilidad excluye explícitamente cualquier decisión sobre quién debería tener acceso a un secreto, cualquier evaluación de políticas o reglas de autorización, y cualquier función ajena a su custodia y entrega controlada.
+
+---
+
+## 7. Responsabilidades
+
+### 7.1. Almacenamiento Seguro
+
+Mantener la información sensible bajo mecanismos de protección adecuados a su naturaleza. Un secreto nunca se conserva de forma que su divulgación accidental comprometa al ecosistema.
+
+### 7.2. Verificación de Autorización Previa
+
+El Motor Secretos no decide qué motor puede solicitar un secreto determinado, ni evalúa políticas de acceso. Esa decisión corresponde exclusivamente al Motor Seguridad. La responsabilidad del Motor Secretos se limita a verificar que la decisión de autorización presentada junto a una solicitud sea válida, vigente y corresponda al secreto solicitado, antes de proceder con su entrega.
+
+### 7.3. Gestión del Ciclo de Vida
+
+Administrar el ciclo de vida completo de cada secreto: su creación, su custodia activa, su rotación, su revocación y su eliminación definitiva, conforme a las reglas descritas en la Sección 9.
+
+### 7.4. Auditoría
+
+Registrar toda operación crítica relacionada con un secreto —su creación, su acceso, su rotación, su revocación y todo intento de acceso denegado— sin registrar jamás el valor del secreto mismo.
+
+### 7.5. Entrega mediante Referencias Controladas
+
+Siempre que sea conceptualmente posible, el Motor Secretos privilegia la entrega de referencias, accesos temporales o mecanismos acotados en el tiempo, en lugar de exponer un valor permanente al motor solicitante.
+
+---
+
+## 8. Modelo Conceptual de Secreto
+
+Todo secreto administrado por el motor posee una identidad propia, descrita por los siguientes atributos conceptuales:
+
+| Atributo | Descripción |
+|---|---|
+| Identificador | Referencia única y estable del secreto dentro del ecosistema. |
+| Nombre descriptivo | Denominación conceptual que permite reconocer su propósito sin revelar su valor. |
+| Motor responsable del uso | El motor de dominio autorizado a utilizar el secreto conforme a las políticas vigentes, sin que ello implique posesión sobre la información custodiada. |
+| Alcance | El conjunto de motores, Nodos o servicios autorizados a solicitarlo, conforme a las políticas evaluadas por el Motor Seguridad. |
+| Estado | La condición vigente del secreto dentro de su ciclo de vida. |
+| Fecha de creación | El momento conceptual en que el secreto ingresó bajo custodia. |
+
+Estos atributos son conceptuales: no prescriben un formato, una estructura de datos ni una tecnología concreta de representación.
+
+La custodia del secreto reside, en todo momento y sin excepción, en el Motor Secretos. Ningún otro motor —incluido el motor responsable del uso— es propietario de la información custodiada.
+
+---
+
+## 9. Ciclo de Vida del Secreto
+
+Todo secreto atraviesa un ciclo de vida administrado por el motor:
 
 ```
 Creación
-
-↓
-
-Almacenamiento
-
-↓
-
-Uso autorizado
-
-↓
-
-Rotación
-
-↓
-
+   │
+   ▼
+Custodia Activa
+   │
+   ▼
+Rotación (cuando corresponda)
+   │
+   ▼
 Revocación
-
-↓
-
-Eliminación segura
+   │
+   ▼
+Eliminación Segura
 ```
+
+### 9.1. Rotación Preventiva
+
+Un secreto crítico puede sustituirse por uno nuevo de forma planificada, permitiendo que los motores consumidores migren de forma progresiva antes de que el secreto anterior se retire.
+
+### 9.2. Rotación de Emergencia
+
+Ante una sospecha de compromiso, el secreto afectado se revoca de forma inmediata, se genera un reemplazo y se notifica a los motores consumidores, quedando el episodio íntegramente registrado en la auditoría del motor.
 
 ---
 
-# 2.4. Auditoría
+## 10. Límites del Motor
 
-Registrar operaciones críticas relacionadas con secretos.
+El Motor Secretos **no** debe:
 
-Ejemplos:
-
-```text
-SECRET_CREATED
-
-SECRET_ACCESSED
-
-SECRET_ROTATED
-
-SECRET_REVOKED
-```
-
----
-
-# 2.5. Proporcionar Referencias Seguras
-
-Los motores del CORE no deben manejar directamente valores sensibles cuando no sea necesario.
-
-El Motor Secretos puede entregar:
-
-- Referencias.
-- Tokens temporales.
-- Accesos limitados.
-
----
-
-Ejemplo:
-
-En vez de:
-
-```json
-{
- "apiKey":"valor_real"
-}
-```
-
-Puede entregar:
-
-```json
-{
- "secretReference":"provider-ai-key"
-}
-```
-
----
-
-# 3. Límites del Motor
-
-El Motor de Secretos NO debe:
-
-- Definir permisos de usuarios.
-- Administrar identidad.
+- Definir permisos, roles o políticas de acceso: esa responsabilidad pertenece exclusivamente al Motor Seguridad.
+- Evaluar reglas de autorización ni interpretar políticas de seguridad.
+- Administrar identidad ni existencia de Nodos: esa responsabilidad pertenece exclusivamente al Motor Nodos.
 - Contener lógica de negocio.
-- Decidir cuándo un secreto debe utilizarse.
-- Reemplazar al Motor Configuración.
-- Exponer secretos directamente al Frontend.
-- Ser utilizado como almacenamiento general.
+- Decidir cuándo o por qué un secreto debe utilizarse.
+- Reemplazar al Motor Configuración en la administración de parámetros operativos no sensibles.
+- Exponer secretos directamente a interfaces de experiencia o clientes finales.
+- Actuar como almacenamiento general de información no sensible.
+- Construir memoria histórica o contexto evolutivo de un Nodo: esa responsabilidad pertenece exclusivamente al Motor Evolución del Nodo.
+- Presentarse, ni siquiera conceptualmente, como propietario de la información sensible que custodia.
 
 ---
 
-Ejemplo:
+## 11. Relación con los demás Motores
 
-Incorrecto:
+El Motor Secretos funciona como un servicio transversal del CORE, consumido exclusivamente a través de contratos públicos, tanto por motores internos como, indirectamente, por solicitudes externas.
 
-```text
-Guardar preferencias del usuario
-```
+### 11.1. Relación con el Motor Seguridad
 
-Corresponde al:
+Esta es la relación más determinante de la presente especificación.
 
-```
-Motor Configuración
-```
+> Ninguna entrega de un secreto ocurre sin una decisión de autorización previa, emitida por el Motor Seguridad. El Motor Secretos no evalúa políticas, roles ni permisos: solo verifica que la decisión recibida sea válida y la ejecuta.
 
----
+| | Motor Seguridad | Motor Secretos |
+|---|---|---|
+| Función | Decide autorizaciones y evalúa políticas | Custodia información sensible |
+| Resultado que produce | Permitido / Denegado | El secreto, entregado bajo autorización verificada |
+| Conoce políticas y reglas | Sí | No |
+| Conoce el contenido de los secretos | No | Sí |
 
-Incorrecto:
+El Motor Seguridad decide. El Motor Secretos custodia y entrega. Ninguno de los dos invade la responsabilidad del otro.
 
-```text
-Determinar si un usuario puede acceder
-```
+### 11.2. Relación con el Motor API
 
-Corresponde al:
+El Motor API constituye la frontera de comunicación entre el exterior del ecosistema y el CORE. Cuando una solicitud de acceso a un secreto se origina fuera del CORE, dicha solicitud se canaliza obligatoriamente a través del Motor API, que la enruta hacia el motor de dominio correspondiente.
 
-```
-Motor API / Seguridad
-```
+El Motor API no es, sin embargo, un intermediario obligatorio para las interacciones que ocurren íntegramente entre motores internos del CORE. Un motor de dominio puede solicitar la evaluación de una autorización al Motor Seguridad, y posteriormente un secreto al Motor Secretos, mediante contratos públicos directos, sin que ello exija atravesar el Motor API. El Motor API interviene únicamente cuando la solicitud original proviene de un actor externo al CORE.
 
----
+En ambos casos —solicitud externa o solicitud interna— rige el mismo principio: ninguna entrega de un secreto ocurre sin una decisión de autorización previa del Motor Seguridad.
 
-# 4. Principios de Seguridad
+### 11.3. Relación con el Motor de Inteligencia Artificial y otros Motores de Capacidades
 
-## 4.1. Principio de Mínimo Acceso
+Cuando un motor de capacidades requiere acceso a una credencial de un proveedor externo, solicita dicho acceso siguiendo el flujo de autorización descrito en la Sección 12. El motor consumidor desconoce el mecanismo de custodia; puede cambiar de proveedor externo sin que ello afecte al Motor Secretos ni al resto del CORE.
 
-Cada motor solamente debe acceder a los secretos estrictamente necesarios.
+### 11.4. Relación con el Motor Configuración
 
----
+Existe una separación estricta entre ambos motores:
 
-## 4.2. Principio de Separación
+| | Motor Configuración | Motor Secretos |
+|---|---|---|
+| Administra | Parámetros operativos no sensibles (por ejemplo, un proveedor seleccionado, un límite operativo, una preferencia) | Información sensible (por ejemplo, la credencial de acceso a ese proveedor) |
+| Naturaleza de la información | Pública dentro del ecosistema | Confidencial |
+| Puede exponerse en registros | Sí, cuando corresponda | Nunca |
 
-Los secretos deben permanecer separados de:
+Ambos conjuntos de información nunca se mezclan en una misma responsabilidad.
 
-- Código.
-- Configuración.
-- Base de Datos pública.
-- Frontend.
+### 11.5. Relación con el Motor Nodos
 
----
+Un secreto puede estar asociado conceptualmente a un Nodo como motor o actor responsable de su uso autorizado. Esa asociación no constituye propiedad sobre la información custodiada:
 
-## 4.3. Principio de Sustitución
+- El Motor Nodos mantiene qué actor está asociado a dicho uso.
+- El Motor Secretos mantiene la custodia, la protección y la entrega controlada de la credencial correspondiente, y la conserva en todo momento bajo su exclusiva responsabilidad.
 
-El proveedor tecnológico utilizado para almacenar secretos puede cambiar sin afectar el CORE.
+Ninguno de los dos motores asume la responsabilidad del otro, y ningún Nodo es, en sentido arquitectónico, propietario de la información sensible que el Motor Secretos custodia en su nombre.
 
-Ejemplo:
+### 11.6. Relación con el Motor Persistencia
 
-```
-Vault
+Cualquier información estructural no sensible que el propio Motor Secretos necesite conservar —como los metadatos descritos en la Sección 8, excluyendo siempre el valor del secreto— se persiste a través del Motor Persistencia, mediante su contrato público, igual que cualquier otro motor de dominio. El Motor Secretos no delega en el Motor Persistencia la protección del valor sensible en sí.
 
-↓
+### 11.7. Relación con el Motor Eventos
 
-AWS Secrets Manager
+El Motor Secretos comunica hechos ocurridos —la creación, rotación, revocación o denegación de acceso a un secreto— a través del Motor Eventos, nunca el valor del secreto involucrado. El motor también puede consumir eventos de otros motores para reaccionar operativamente ante cambios relevantes para su custodia, conforme a lo descrito en la Sección 13.2, sin que ello implique evaluar o interpretar reglas de autorización, responsabilidad que permanece exclusiva del Motor Seguridad.
 
-↓
+### 11.8. Relación con el Motor Evolución del Nodo
 
-Sistema propio cifrado
-```
+El Motor Secretos no participa en la construcción de memoria histórica ni de contexto evolutivo de ningún Nodo. Esa responsabilidad pertenece exclusivamente al Motor Evolución del Nodo, que no tiene, a su vez, ningún acceso a los valores custodiados por el Motor Secretos.
 
 ---
 
-## 4.4. Principio de Nunca Exponer
+## 12. Flujo de Autorización y Entrega
 
-Un secreto nunca debe aparecer en:
+Ninguna entrega de un secreto ocurre sin una decisión de autorización previa y vigente, emitida por el Motor Seguridad. Este invariante se mantiene sin excepción, tanto si la solicitud se origina fuera del CORE como si ocurre íntegramente entre motores internos.
 
-- Interfaces públicas.
-- Logs.
-- Eventos generales.
-- Respuestas API no autorizadas.
+### 12.1. Solicitud Externa
 
----
-
-# 5. Modelo de Secretos
-
-Cada secreto debe poseer una identidad propia.
-
-Modelo conceptual:
-
-```json
-{
- "id": "secret_001",
- "name": "openai-production-key",
- "owner": "motor_ia",
- "scope": "provider",
- "status": "active",
- "createdAt": "2026-07-13"
-}
-```
-
----
-
-Campos:
-
-## id
-
-Identificador único del secreto.
-
----
-
-## name
-
-Nombre descriptivo.
-
----
-
-## owner
-
-Motor responsable del uso.
-
----
-
-## scope
-
-Alcance permitido.
-
-Ejemplos:
+Cuando la solicitud se origina fuera del CORE, el Motor API actúa como frontera de entrada:
 
 ```
-motor
-
-node
-
-system
-
-external_service
-```
-
----
-
-## status
-
-Estado actual:
-
-```
-active
-
-rotating
-
-revoked
-
-expired
-```
-
----
-
-**Fin Parte 1**
-
----
-
-# 6. Contratos Públicos del Motor de Secretos
-
-El Motor de Secretos expone capacidades mediante contratos públicos.
-
-Ningún motor puede acceder directamente a la implementación interna del almacenamiento seguro.
-
----
-
-# 6.1. Contrato Principal
-
-## ISecretsManager
-
-Responsabilidad:
-
-Administrar solicitudes autorizadas de secretos dentro del ecosistema RegulaPro.
-
----
-
-Capacidades principales:
-
-```text
-createSecret()
-
-getSecret()
-
-rotateSecret()
-
-revokeSecret()
-
-listAuthorizedSecrets()
-
-validateAccess()
-```
-
----
-
-## createSecret()
-
-Permite registrar un nuevo secreto dentro del sistema.
-
-Entrada conceptual:
-
-```json
-{
- "name": "provider-ai-key",
- "ownerReference": "motor_ia",
- "scope": "external_service"
-}
-```
-
----
-
-Salida:
-
-```json
-{
- "secretId": "secret_001",
- "status": "created"
-}
-```
-
----
-
-## getSecret()
-
-Permite solicitar un secreto autorizado.
-
-Entrada:
-
-```json
-{
- "secretId": "secret_001",
- "requester": "motor_ia"
-}
-```
-
----
-
-El Motor Secretos valida:
-
-- Identidad del solicitante.
-- Permisos.
-- Alcance.
-- Estado del secreto.
-
----
-
-Respuesta:
-
-```json
-{
- "temporaryAccess": true,
- "credential": "******"
-}
-```
-
----
-
-## rotateSecret()
-
-Permite reemplazar una credencial sin afectar consumidores.
-
-Ejemplo:
-
-```
-Clave antigua
-
-↓
-
-Rotación
-
-↓
-
-Clave nueva
-```
-
----
-
-## revokeSecret()
-
-Invalida inmediatamente un secreto comprometido.
-
-Ejemplo:
-
-```
-SECRET_REVOKED
-
-↓
-
-Todos los accesos posteriores bloqueados
-```
-
----
-
-## 6.2. Contrato de Migraciones
-
-IMigrationManager
-
-Responsabilidad:
-
-Gestionar evolución controlada del modelo interno.
-
-## 6.3 Contrato de Eventos
-
-El Motor Secretos comunica cambios mediante eventos públicos administrados por el Motor Eventos.
-
-Ejemplos:
-
-SECRET_ROTATED
-
-SECRET_REVOKED
-
-SECRET_ACCESS_DENIED
-
-Los eventos informan hechos ocurridos.
-
-No entregan valores sensibles.
-
-# 7. Relaciones con otros Motores
-
-El Motor de Secretos funciona como un servicio transversal del CORE.
-
----
-
-# 7.1. Relación con Motor API
-
-## Consume:
-
-Motor API utiliza secretos para:
-
-- Firmas JWT.
-- Claves criptográficas.
-- API Keys internas.
-- Certificados.
-
----
-
-Flujo:
-
-```
-Usuario
-
-↓
-
-Motor API
-
-↓
-
-Solicita clave privada
-
-↓
-
+Actor externo
+     │
+     ▼
+  Motor API
+     │
+     ▼
+Motor Seguridad ──────► Decisión: Permitido / Denegado
+     │
+     ▼ (solo si la decisión es "Permitido")
 Motor Secretos
-
-↓
-
-Firma autenticación
-
-```
-
----
-
-El Motor API nunca almacena:
-
-- Claves maestras.
-- Tokens permanentes.
-- Credenciales privadas.
-
----
-
-# 7.2. Relación con Motor IA
-
-El Motor IA requiere acceso a proveedores externos.
-
-Ejemplo:
-
-```
-Motor IA
-
-↓
-
-Solicita
-
-↓
-
-API Key proveedor IA
-
-↓
-
-Motor Secretos
-
-```
-
----
-
-El Motor IA desconoce dónde está almacenada la clave.
-
-Puede cambiar:
-
-```
-OpenAI
-
-↓
-
-Gemini
-
-↓
-
-Proveedor propio
-
-```
-
-sin modificar el CORE.
-
----
-
-# 7.3. Relación con Motor Configuración
-
-Existe una separación estricta:
-
----
-
-Motor Configuración administra:
-
-```
-URL proveedor
-
-Modelo seleccionado
-
-Límites
-
-Preferencias
-```
-
----
-
-Motor Secretos administra:
-
-```
-API Key
-
-Token
-
-Credencial
-
-Certificado
-```
-
----
-
-Ejemplo:
-
-Configuración:
-
-```json
-{
- "provider":"openai",
- "model":"gpt-x"
-}
-```
-
----
-
-Secretos:
-
-```json
-{
- "provider_key":"********"
-}
-```
-
----
-
-Nunca deben mezclarse.
-
----
-
-# 7.4. Relación con Motor Nodos
-
-Los secretos pueden pertenecer a un Nodo determinado.
-
-Ejemplo:
-
-Un Nodo empresa puede poseer:
-
-```
-Nodo Empresa
-
-↓
-
-Secretos propios
-
-↓
-
-Credenciales servicios externos
-```
-
----
-
-El Motor Nodos mantiene:
-
-```
-Quién es el propietario
-```
-
----
-
-El Motor Secretos mantiene:
-
-```
-Cómo se protege la credencial
-```
-
----
-
-Separación:
-
-Nodo:
-
-```
-ownerId
-```
-
-Secretos:
-
-```
-secretId
-ownerReference
-```
-
----
-
-# 8. Flujo de Autorización
-
-Toda solicitud debe seguir:
-
-```
-Motor solicitante
-
-↓
-
-Motor API
-
-↓
-
-Validación de autorización
-
-↓
-
-Motor Secretos
-
-        |
-
-        v
-
-Validación de permisos
-
-        |
-
-        v
-
+     │
+     ▼
+Verificación de la decisión recibida
+     │
+     ▼
 Entrega controlada
+```
+
+### 12.2. Solicitud Interna entre Motores del CORE
+
+Cuando la solicitud se origina íntegramente entre motores del CORE, el motor solicitante puede dirigirse directamente al Motor Seguridad y, posteriormente, al Motor Secretos, mediante contratos públicos, sin que el Motor API intervenga como intermediario obligatorio:
 
 ```
+Motor de dominio solicitante
+     │
+     ▼
+Motor Seguridad ──────► Decisión: Permitido / Denegado
+     │
+     ▼ (solo si la decisión es "Permitido")
+Motor Secretos
+     │
+     ▼
+Verificación de la decisión recibida
+     │
+     ▼
+Entrega controlada
+```
+
+En ambos casos, el Motor Secretos rechaza cualquier solicitud que no presente una decisión de autorización válida y vigente. Queda arquitectónicamente prohibido que cualquier motor acceda directamente al mecanismo interno de custodia del Motor Secretos sin haber transitado, primero, por una decisión del Motor Seguridad.
 
 ---
 
-Nunca:
+## 13. Eventos del Motor Secretos
 
-```
-Motor cualquiera
-
-        |
-
-        v
-
-Base de datos de secretos
-
-```
-
----
-
-# 9. Eventos del Motor Secretos
-
-El Motor Secretos comunica hechos mediante el Motor Eventos.
-
----
-
-# 9.1. Eventos Emitidos
+### 13.1. Eventos Emitidos
 
 | Evento | Descripción |
 |---|---|
-| SECRET_CREATED | Nuevo secreto registrado |
-| SECRET_ACCESSED | Se utilizó un secreto autorizado |
-| SECRET_ROTATED | Se realizó una rotación |
-| SECRET_REVOKED | Se invalidó un secreto |
-| SECRET_ACCESS_DENIED | Acceso rechazado |
+| SECRET_CREATED | Se registró un nuevo secreto. |
+| SECRET_ACCESSED | Se entregó un secreto conforme a una autorización válida. |
+| SECRET_ROTATED | Se sustituyó el valor de un secreto vigente. |
+| SECRET_REVOKED | Se invalidó un secreto de forma permanente. |
+| SECRET_ACCESS_DENIED | Se rechazó una solicitud de acceso. |
 
----
+### 13.2. Eventos Consumidos
 
-# 9.2. Eventos Consumidos
-
-| Evento | Origen | Acción |
+| Evento | Origen conceptual | Reacción del Motor Secretos |
 |---|---|---|
-| NODE_ARCHIVED | Motor Nodos | Revisar secretos asociados |
-| USER_REMOVED | Motor Nodos/API | Revocar accesos |
-| SECURITY_POLICY_UPDATED | Motor Configuración | Actualizar reglas |
+| NODE_ARCHIVED | Motor Nodos | Revisar los secretos asociados al Nodo archivado, conforme a su propio ciclo de vida. |
+| ACTOR_REMOVED | Motor Nodos / Motor Seguridad | Invalidar los accesos temporales vigentes asociados a dicho actor. |
+| SECURITY_POLICY_UPDATED | Motor Seguridad | Invalidar los accesos temporales ya entregados que dependan de la política modificada, remitiendo toda solicitud posterior a una nueva evaluación del Motor Seguridad. |
+
+En ningún caso el Motor Secretos interpreta el contenido de una política de seguridad. Su reacción ante estos eventos se limita a invalidar entregas previas o a exigir una nueva verificación; la evaluación de las reglas permanece, en todo momento, exclusiva del Motor Seguridad.
+
+Los eventos representan hechos ya ocurridos. Ninguno de ellos transporta el valor de un secreto.
 
 ---
 
-**Fin Parte 2**
+## 14. Auditoría y Trazabilidad
+
+Toda operación sensible sobre un secreto queda registrada, incluyendo como mínimo: el evento ocurrido, el motor solicitante, el identificador conceptual del secreto, el momento en que ocurrió y el resultado de la operación.
+
+El registro de auditoría nunca contiene el valor real de un secreto, únicamente el hecho de su creación, acceso, rotación, revocación o denegación.
 
 ---
 
-# 10. Arquitectura de Seguridad del Motor Secretos
+## 15. Independencia Tecnológica
 
-El Motor Secretos debe operar bajo un modelo de seguridad en profundidad.
+El Motor Secretos no depende de ningún mecanismo de custodia, algoritmo criptográfico, infraestructura o proveedor concreto, presente o futuro.
 
-La protección de un secreto no depende de una única barrera, sino de múltiples capas:
-
-```
-Identidad
-
-↓
-
-Autorización
-
-↓
-
-Validación
-
-↓
-
-Entrega controlada
-
-↓
-
-Auditoría
-
-```
+La arquitectura de RegulaPro únicamente exige que cualquier implementación satisfaga las siguientes propiedades: confidencialidad, integridad, entrega condicionada a autorización previa, auditabilidad y disponibilidad de un contrato público estable. La técnica concreta mediante la cual se satisfacen estas propiedades es enteramente reemplazable sin afectar al resto del CORE.
 
 ---
 
-# 10.1. Identidad del Solicitante
+## 16. Ubicación dentro del CORE
 
-Toda solicitud de secreto debe identificar claramente quién realiza la petición.
+El Motor Secretos pertenece a los Motores Fundamentales del CORE. Su relación con el resto de la arquitectura es la de un servicio transversal de custodia, disponible mediante contrato público tanto para solicitudes externas como internas, nunca la de una autoridad jerárquica sobre otros motores.
 
-El solicitante puede ser:
+```
+   Solicitud externa                 Solicitud interna
+   (a través de Motor API)      (motor a motor, vía contrato)
+            │                              │
+            └──────────────┬───────────────┘
+                            ▼
+                    MOTOR SEGURIDAD
+              (decide: permitido / denegado)
+                            │
+                            ▼
+                    MOTOR SECRETOS
+        (custodia y entrega controlada de secretos)
+                            │
+                            ▼
+                  MOTOR PERSISTENCIA
+   (conservación estructural de los metadatos del secreto)
+```
 
-- Un Motor del CORE.
-- Un Nodo autorizado.
-- Un servicio interno.
-- Un sistema externo autorizado.
+El Motor Eventos y el Motor Configuración operan de forma transversal respecto de este flujo, conforme a lo descrito en las Secciones 11.4 y 11.7, sin insertarse como intermediarios obligatorios de la entrega de un secreto.
 
 ---
 
-Ejemplo conceptual:
+## 17. Principios Permanentes
 
-```json
-{
- "requester": "motor_ia",
- "action": "getSecret",
- "secret": "provider-ai-key"
-}
-```
-
----
-
-# 10.2. Autorización por Alcance
-
-Los secretos deben poseer un alcance definido.
-
-Ejemplos:
-
-```
-system
-
-motor
-
-node
-
-external_service
-
-temporary
-```
+- Los secretos nunca pertenecen al código.
+- Los secretos nunca pertenecen a las interfaces de experiencia ni a los clientes finales.
+- La configuración operativa nunca contiene credenciales.
+- Ningún secreto se entrega sin una decisión de autorización previa del Motor Seguridad.
+- El Motor Secretos custodia; nunca decide ni evalúa políticas.
+- La custodia nunca implica propiedad sobre la información custodiada.
+- Todo acceso crítico queda auditado, sin exponer jamás el valor custodiado.
+- La tecnología de custodia puede cambiar. El contrato permanece.
+- La incumbencia del Motor Secretos termina donde comienza la decisión de autorización.
 
 ---
 
-Ejemplo:
+## 18. Conclusión
 
-Un secreto:
+El Motor Secretos establece la separación definitiva entre la identidad, la configuración operativa, la decisión de autorización y la información sensible del ecosistema.
 
-```
-openai-production-key
-```
+Esta separación permite que RegulaPro incorpore nuevas capacidades, proveedores externos, dispositivos y aplicaciones futuras sin comprometer jamás la confidencialidad del CORE, precisamente porque el Motor Secretos nunca decide por sí mismo: custodia y entrega, exclusivamente, lo que el Motor Seguridad ha autorizado, sin apropiarse en ningún momento de la información que protege.
 
-Puede permitir:
-
-```
-Motor IA ✅
-
-Motor Audio ❌
-
-Frontend ❌
-```
+El Motor Secretos no protege solamente claves. Protege la confianza estructural del ecosistema.
 
 ---
 
-# 10.3. Entrega Controlada
-
-Cuando sea posible, el Motor Secretos debe evitar entregar valores permanentes.
-
-Preferencia:
-
-```
-Referencia temporal
-
-↓
-
-Token limitado
-
-↓
-
-Acceso controlado
-```
-
----
-
-Ejemplo:
-
-En lugar de:
-
-```json
-{
-"apiKey":"clave-real"
-}
-```
-
-Preferir:
-
-```json
-{
-"accessToken":"temporal-token",
-"expires":"15min"
-}
-```
-
----
-
-# 11. Rotación y Ciclo de Vida
-
-Todo secreto debe tener un ciclo de vida administrado.
-
----
-
-## Estados oficiales
-
-```
-CREATED
-
-↓
-
-ACTIVE
-
-↓
-
-ROTATING
-
-↓
-
-EXPIRED
-
-↓
-
-REVOKED
-
-```
-
----
-
-# 11.1. Rotación Preventiva
-
-Los secretos críticos deben poder cambiarse antes de una emergencia.
-
-Ejemplo:
-
-```
-Clave actual
-
-↓
-
-Nueva clave generada
-
-↓
-
-Validación
-
-↓
-
-Cambio progresivo
-
-↓
-
-Retiro clave antigua
-
-```
-
----
-
-# 11.2. Rotación de Emergencia
-
-Ante una sospecha de compromiso:
-
-```
-Alerta
-
-↓
-
-Revocación inmediata
-
-↓
-
-Generación nueva credencial
-
-↓
-
-Actualización consumidores
-
-↓
-
-Auditoría
-
-```
-
----
-
-# 12. Auditoría y Trazabilidad
-
-Toda operación sensible debe quedar registrada.
-
----
-
-Eventos mínimos:
-
-```
-SECRET_CREATED
-
-SECRET_READ
-
-SECRET_ROTATED
-
-SECRET_REVOKED
-
-SECRET_ACCESS_DENIED
-```
-
----
-
-El registro debe contener:
-
-```json
-{
- "event":"SECRET_ACCESSED",
- "requester":"motor_ia",
- "secretId":"secret_001",
- "timestamp":"2026-07-13",
- "result":"success"
-}
-```
-
----
-
-Nunca debe registrar:
-
-```
-Valor real del secreto
-```
-
----
-
-# 13. Independencia Tecnológica
-
-El Motor Secretos no depende de una tecnología específica.
-
-Puede implementarse mediante:
-
-```
-Hashicorp Vault
-
-↓
-
-AWS Secrets Manager
-
-↓
-
-Azure Key Vault
-
-↓
-
-Sistema propio cifrado
-
-```
-
----
-
-La arquitectura RegulaPro solo exige:
-
-- Seguridad.
-- Contrato público.
-- Control de acceso.
-- Auditoría.
-
----
-
-# 14. Ubicación dentro del CORE
-
-El Motor Secretos pertenece a los Motores Fundamentales.
-
-Arquitectura:
-
-```
-                 CORE REGULAPRO
-
-
-                MOTOR API
-
-                    │
-
-        ┌───────────┴───────────┐
-
-        │                       │
-
- MOTOR SECRETOS          MOTOR EVENTOS
-
-        │
-
-        │
-
- MOTOR BASE DATOS
-
-
-        │
-
-        │
-
- MOTORES ESPECIALIZADOS
-
- IA - MAPAS - AUDIO - ETC
-
-```
-
----
-
-# 15. Reglas Permanentes del Motor Secretos
-
-## Regla 1
-
-Los secretos nunca pertenecen al código.
-
----
-
-## Regla 2
-
-Los secretos nunca pertenecen al Frontend.
-
----
-
-## Regla 3
-
-La configuración no contiene credenciales.
-
----
-
-## Regla 4
-
-Todo acceso debe ser autorizado.
-
----
-
-## Regla 5
-
-Todo acceso crítico debe quedar auditado.
-
----
-
-## Regla 6
-
-La tecnología de almacenamiento puede cambiar.
-
-El contrato permanece.
-
----
-
-# 16. Conclusión
-
-El Motor Secretos establece la separación definitiva entre:
-
-```
-Identidad
-
-Configuración
-
-Información sensible
-```
-
-Esta separación permite que RegulaPro pueda integrar:
-
-- Inteligencia Artificial.
-- Servicios externos.
-- Dispositivos.
-- Aplicaciones futuras.
-
-sin comprometer la seguridad del ecosistema.
-
----
-
-El Motor Secretos no protege solamente claves.
-
-Protege la confianza del CORE.
-
----
-
-# Estado del Documento
-
-Motor:
-
-```
-Motor Secretos
-```
-
-Versión:
-
-```
-1.0.0
-```
-
-Estado:
-
-```
-Propuesta Arquitectónica
-```
-
-Arquitectura:
-
-```
-RegulaPro CORE
-```
-
-Fecha:
-
-```
-Julio 2026
-```
+## Firma Final del Documento
+
+| Campo | Valor |
+|---|---|
+| Documento | Motor Secretos |
+| Tipo | Especificación Arquitectónica |
+| Estado | DOCUMENTO FUNDACIONAL |
+| Versión | 1.0.0 |
+| Revisión | Versión Final Auditada |
+| Arquitectura | RegulaPro CORE |
+| Fecha | Julio 2026 |
 
 ---
 
 **Fin del Documento**
+
+*Motor Secretos – RegulaPro CORE – Especificación Arquitectónica v1.0.0*
