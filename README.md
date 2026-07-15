@@ -1,72 +1,185 @@
-# RegulaPro
+# RegulaPro CORE
 
-## Plataforma digital de arquitectura, regulación e inteligencia artificial
-
-RegulaPro es un ecosistema tecnológico diseñado para conectar personas, propiedades, profesionales y conocimiento normativo mediante una arquitectura modular basada en nodos.
-
-No es solamente una aplicación web. Es una plataforma evolutiva donde diferentes motores especializados colaboran bajo un núcleo común.
+**Arquitectura fundacional del ecosistema RegulaPro**
 
 ---
 
-# Filosofía
+## 1. Qué es RegulaPro CORE
 
-RegulaPro se construye bajo un principio fundamental:
+RegulaPro CORE es un ecosistema tecnológico basado en una arquitectura modular de motores independientes.
 
-> La arquitectura debe permanecer estable mientras la tecnología puede evolucionar.
+No es una aplicación web tradicional. Es una plataforma evolutiva donde diferentes motores especializados colaboran bajo un núcleo común mediante contratos públicos.
 
-El sistema está diseñado para permitir reemplazar tecnologías, bases de datos o proveedores de inteligencia artificial sin afectar el núcleo conceptual del ecosistema.
+Este repositorio contiene la arquitectura fundacional del CORE: sus principios, sus motores y los contratos que gobiernan la comunicación entre ellos.
 
 ---
 
-# Arquitectura del CORE
+## 2. Principio Fundamental
 
-El núcleo de RegulaPro está compuesto por motores independientes:
+> "La arquitectura debe permanecer estable mientras la tecnología puede evolucionar."
 
-- Motor de Nodos
-- Motor API
-- Motor Base de Datos
-- Motor Eventos
-- Motor Configuración
+El sistema está diseñado para que tecnologías, proveedores, bases de datos o modelos de inteligencia artificial puedan cambiar sin romper la arquitectura conceptual.
+
+Ninguna decisión de infraestructura, lenguaje o proveedor forma parte de la arquitectura. La arquitectura describe responsabilidades y contratos; la tecnología los implementa.
+
+---
+
+## 3. El Concepto de Nodo
+
+RegulaPro trabaja con el concepto de **Nodo**.
+
+Un Nodo no es solamente un registro o un estado actual. Un Nodo representa una existencia dentro del ecosistema y posee identidad, relaciones, eventos y trayectoria histórica.
+
+> "Un Nodo no es un estado, es una trayectoria."
+
+Todo lo que el ecosistema construye —motores, contratos, capacidades— existe en función de servir a los Nodos y a su evolución a lo largo del tiempo.
+
+---
+
+## 4. Arquitectura del CORE
+
+El CORE se organiza como un conjunto de motores independientes, cada uno con responsabilidad única, que colaboran exclusivamente mediante contratos públicos.
+
+### 4.1. Motores Fundamentales
+
+| Motor | Responsabilidad |
+|---|---|
+| Motor Nodos | Identidad, existencia y relaciones entre Nodos. |
+| Motor API | Comunicación controlada entre el exterior y el CORE. |
+| Motor Eventos | Comunicación basada en hechos ocurridos. |
+| Motor Base de Datos | Persistencia estructural. |
+| Motor Configuración | Parámetros operativos del ecosistema. |
+| Motor Seguridad | Autorizaciones y políticas de acceso. |
+| Motor Secretos | Gestión segura de información sensible. |
+
+### 4.2. Motor Evolutivo
+
+**Motor Evolución del Nodo**
+
+Responsabilidad: construir memoria histórica, organizar trayectoria, identificar patrones estructurales y generar contexto evolutivo autorizado.
+
+Debe quedar explícitamente establecido que el Motor Evolución del Nodo:
+
+- No es inteligencia artificial.
+- No toma decisiones.
+- No interpreta intenciones.
+- No modifica identidad.
+- No reemplaza a otros motores.
+
+Su función es observar, registrar, organizar y consolidar la evolución histórica de cada Nodo.
+
+### 4.3. Motores Especializados Futuros
+
+Los siguientes motores extienden las capacidades del CORE conforme el ecosistema lo requiera, sin alterar su arquitectura fundamental:
+
 - Motor IA
 - Motor Conversaciones
 - Motor Multimedia
-- Motor Mapas
 - Motor Documentos
+- Motor Mapas
 - Motor Audio
 - Motor Cámara
 - Motor Interfaz
 
-Cada motor posee una responsabilidad única y se comunica mediante interfaces definidas.
+### 4.4. Filosofía Común de Todos los Motores
+
+Cada motor del CORE, sin excepción:
+
+- Tiene responsabilidad única.
+- Mantiene independencia respecto de los demás.
+- Se comunica exclusivamente mediante contratos públicos.
+- No conoce las implementaciones internas de otros motores.
 
 ---
 
-# Documentación Fundacional
+## 5. Contratos Públicos entre Motores
 
-La arquitectura del sistema se encuentra documentada en:
+Los motores no se comunican mediante acceso directo a bases de datos ni a código interno.
 
-/docs
+La comunicación correcta entre motores sigue siempre el siguiente flujo:
 
-Documentos principales:
+```
+Solicitud
+   ↓
+Contrato Público
+   ↓
+Motor Responsable
+   ↓
+Respuesta
+```
 
-- Constitución de RegulaPro
-- Arquitectura General
-- Principios del CORE
-- Especificación de Motores
+Ningún motor invoca directamente la implementación de otro. Toda interacción ocurre a través del contrato público que el motor destino expone, con independencia de la tecnología con la que dicho motor esté construido.
+
+### 5.1. Eventos como Hechos Ocurridos
+
+Los eventos que circulan entre motores representan hechos ya ocurridos, nunca instrucciones ni órdenes.
+
+**Ejemplo correcto:** `NODE_CREATED`
+
+**Ejemplo incorrecto:** `CREATE_NODE_NOW`
+
+Un motor emite un evento para declarar que algo sucedió en su dominio. Los motores interesados se suscriben a dicho evento y reaccionan según su propia responsabilidad, sin que el emisor conozca ni condicione dicha reacción.
 
 ---
 
-# Estado del Proyecto
+## 6. Documentación
 
-Actualmente RegulaPro se encuentra en fase de consolidación arquitectónica y migración hacia una infraestructura independiente.
+La documentación arquitectónica completa del proyecto se encuentra en el directorio `/docs`.
+
+```
+docs
+├── 01-Constitucion
+├── 02-Arquitectura
+├── 03-Documentacion_Tecnica
+└── 04-motores
+```
+
+Documentos principales del repositorio:
+
+- Constitución de RegulaPro.
+- Principios del CORE.
+- Arquitectura General.
+- Contratos Públicos entre Motores.
+- Especificaciones Arquitectónicas de Motores.
+
+Toda decisión técnica del proyecto debe ser coherente con estos documentos. Ante cualquier contradicción entre una implementación y la documentación arquitectónica, prevalece siempre la documentación arquitectónica.
 
 ---
 
-# Visión
+## 7. Estado del Proyecto
 
-Construir un compañero digital permanente capaz de acompañar a las personas durante su relación con propiedades, profesionales, información y servicios.
+RegulaPro CORE se encuentra actualmente en fase de:
+
+- Consolidación arquitectónica.
+- Definición de contratos entre motores.
+- Documentación fundacional.
+- Migración hacia infraestructura independiente.
+- Preparación de arquitectura escalable de largo plazo.
+
+Este repositorio refleja el estado fundacional del proyecto. Las capacidades descritas en la documentación representan la arquitectura objetivo, no necesariamente el estado actual de la implementación.
 
 ---
 
-# Licencia
+## 8. Visión
 
-Proyecto en desarrollo.
+RegulaPro CORE busca construir un compañero digital permanente, capaz de acompañar a las personas en su relación con:
+
+- Propiedades.
+- Profesionales.
+- Servicios.
+- Información.
+- Conocimiento.
+- Procesos regulatorios.
+
+La arquitectura descrita en este repositorio es el fundamento sobre el cual dicha visión podrá construirse de forma ordenada, modular y sostenible a lo largo del tiempo.
+
+---
+
+## 9. Contribución
+
+Toda incorporación de un nuevo motor o contrato al CORE debe respetar los principios arquitectónicos documentados en `/docs` y someterse al proceso de revisión definido por la gobernanza del proyecto antes de integrarse.
+
+---
+
+**RegulaPro CORE**
+*Documentación fundacional del repositorio*
