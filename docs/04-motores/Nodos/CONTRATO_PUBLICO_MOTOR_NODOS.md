@@ -32,7 +32,7 @@ El Motor Nodos se fundamenta en los principios de la Constitución de RegulaPro 
 5. **Independencia tecnológica.** Cualquier tecnología de persistencia, framework o infraestructura puede ser reemplazada sin que el contrato sufra modificación alguna.
 6. **Evolución controlada.** Los cambios en el contrato se rigen por un versionado SemVer que protege la compatibilidad y la continuidad del ecosistema a lo largo de décadas.
 7. **Permanencia de la identidad.** La identidad de un Nodo nunca se destruye ni se reutiliza. El ecosistema preserva la trazabilidad completa de cada entidad.
-8. **Grafo acíclico y dirigido.** Las relaciones entre Nodos forman una estructura jerárquica sin ciclos, con un único Nodo raíz que proporciona estabilidad estructural a todo el sistema.
+8. **Modelo de Grafo Dirigido Semántico Flexibilizado.** Las relaciones entre Nodos conforman un grafo dirigido semántico. El modelo permite relaciones recíprocas o ciclos cuando representan correctamente la realidad del dominio, preservando siempre la consistencia referencial y los invariantes arquitectónicos definidos por el Motor Nodos.
 
 ---
 
@@ -90,7 +90,7 @@ El Motor Nodos reconoce las siguientes categorías de Nodos. La lista es extensi
 
 ## 6. Relaciones entre Nodos
 
-El Motor Nodos mantiene un **grafo dirigido acíclico** que conecta Nodos mediante relaciones explícitas.
+El Motor Nodos mantiene un **Modelo de Grafo Dirigido Semántico Flexibilizado**, donde las relaciones representan vínculos semánticos entre entidades. El modelo admite ciclos y relaciones recíprocas cuando estos reflejan correctamente la realidad del dominio, manteniendo siempre la consistencia referencial y la integridad del ecosistema.
 
 Cada relación consta de:
 - Un Nodo origen.
@@ -109,12 +109,12 @@ Tipos de relación básicos definidos en esta versión del contrato:
 | `LOCATED_IN`   | Relación espacial. Un Nodo se encuentra físicamente dentro de un lugar.     |
 
 Reglas invariantes del grafo:
-- No se permiten ciclos bajo ninguna circunstancia.
-- La relación `PEER` se almacena como una sola arista dirigida; la simetría se resuelve a nivel de consulta, evitando así la formación de ciclos.
-- Ambos extremos deben existir en el momento de crear la relación.
-- Si un Nodo se archiva, sus relaciones se preservan como latentes, sin eliminación automática.
-- La eliminación de una relación solo puede realizarse de forma explícita o, excepcionalmente, por la eliminación definitiva de uno de los Nodos involucrados (caso contemplado en futuras ampliaciones del contrato).
-- Las relaciones latentes se reactivan automáticamente cuando el Nodo archivado es restaurado.
+
+- Ambos extremos deben existir antes de crear una relación.
+- Toda relación constituye un agregado independiente del Nodo.
+- La consistencia referencial se valida al momento de crear la relación.
+- Las relaciones pueden representar estructuras jerárquicas, recíprocas o cíclicas cuando su semántica lo requiera.
+- Si un Nodo es archivado, sus relaciones permanecen válidas conforme a las reglas del Motor Nodos.
 
 ---
 
@@ -160,7 +160,7 @@ El Motor Nodos expone sus capacidades a través de las siguientes operaciones, a
 
 ### 9.2 Relaciones
 
-- **Vincular Nodos:** Crear una relación dirigida entre dos Nodos con un tipo válido y, opcionalmente, un bloque de metadatos (`metadata`). Se rechazará cualquier operación que introduzca un ciclo. Emite `RELATIONSHIP_ADDED`.
+- **Vincular Nodos:** Crear una relación dirigida entre dos Nodos con un tipo válido y, opcionalmente, un bloque de metadatos (`metadata`). La operación validará la consistencia referencial y los invariantes arquitectónicos definidos por el Motor Nodos antes de establecer la relación. Emite `RELATIONSHIP_ADDED`.
 - **Desvincular Nodos:** Eliminar una relación existente entre dos Nodos. Emite `RELATIONSHIP_REMOVED`.
 - **Consultar relaciones:** Obtener todas las relaciones (entrantes, salientes o ambas) de un Nodo dado. En el caso de `PEER`, una consulta desde cualquiera de los extremos devolverá la relación.
 
@@ -203,7 +203,7 @@ El Motor Nodos garantiza al resto del ecosistema los siguientes invariantes arqu
 1. **Identidad permanente:** El identificador de un Nodo nunca cambia a lo largo de toda la vida del ecosistema.
 2. **Unicidad:** Dos Nodos distintos jamás pueden compartir el mismo identificador.
 3. **Nodo raíz único:** Solo existe un Nodo de tipo `SYSTEM` en el ecosistema, y es el Nodo raíz.
-4. **Grafo acíclico:** Bajo ninguna circunstancia se permite la formación de ciclos en el grafo de relaciones.
+4. Consistencia referencial del grafo: toda relación debe vincular exclusivamente Nodos registrados conforme a las reglas del Motor Nodos.
 5. **Raíz inmutable:** El Nodo `SYSTEM` existe desde el inicio del ecosistema y no puede ser eliminado, archivado ni modificado en su tipo.
 6. **Historial preservado:** La información de un Nodo archivado se mantiene íntegra; el archivado no implica destrucción de datos.
 7. **Eventos fiables:** Toda operación de escritura que concluye con éxito produce de manera fiable el evento correspondiente.
