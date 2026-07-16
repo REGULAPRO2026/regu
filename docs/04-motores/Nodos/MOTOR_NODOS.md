@@ -96,25 +96,26 @@ Para evitar la degradación de la arquitectura a medida que el sistema escala a 
 ┌──────────────────────────────────────────────────────────────────┐
 │                    SÍ ES RESPONSABILIDAD DEL MOTOR                │
 ├──────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│ • Identidad conceptual y existencia de los Nodos                 │
-│ • Estructura, consistencia y topología del Grafo de Relaciones   │
-│ • Estado existencial (Booting, Active, Sleeping, Archived...)    │
+│                                                                    │
+│ • Identidad conceptual y existencia de los Nodos                  │
+│ • Estructura, consistencia y topología del Grafo de Relaciones    │
+│ • Estado existencial (Booting, Active, Sleeping, Archived...)     │
 │ • Registro taxonómico a través de manifiestos estructurados       │
-│                                                                  │
+│                                                                    │
 └──────────────────────────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────────────────────────┐
 │                    NO ES RESPONSABILIDAD DEL MOTOR                │
 ├──────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│ • Procesar señales físicas de presencia o conectividad de red    │
-│ • Decidir permisos de acceso (Motor Seguridad)                   │
-│ • Custodiar credenciales o claves (Motor Secretos)               │
-│ • Conservar el historial de cambios (Motor Evolución del Nodo)   │
-│ • Ejecutar lógica de negocio (Motores de Capacidades / Módulos)  │
-│                                                                  │
+│                                                                    │
+│ • Procesar señales físicas de presencia o conectividad de red     │
+│ • Decidir permisos de acceso (Motor Seguridad)                    │
+│ • Custodiar credenciales o claves (Motor Secretos)                │
+│ • Conservar el historial de cambios (Motor Evolución del Nodo)    │
+│ • Ejecutar lógica de negocio (Motores de Capacidades / Módulos)   │
+│                                                                    │
 └──────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -182,8 +183,6 @@ Representa el momento del ciclo de vida lógico del Nodo.
 | **SLEEPING** | Estado inactivo o suspendido lógicamente. |
 | **ARCHIVED** | Retirado lógicamente del sistema (soberanía de olvido). |
 | **ERROR** | Estado de falla de integridad estructural. |
-
----
 
 ---
 
@@ -473,8 +472,7 @@ El Motor Nodos consume exclusivamente una abstracción conceptual de persistenci
 
 La traducción hacia una tecnología concreta de almacenamiento corresponde íntegramente al Motor Persistencia, a través de su propio contrato público.
 
-text
-
+```text
                     Motor Nodos
                          │
                      consume
@@ -486,6 +484,9 @@ text
             ▼                         ▼
      Implementación A          Implementación B
    (tecnología reemplazable)  (tecnología reemplazable)
+```
+
+---
 
 # 13. Ubicación dentro del CORE y Jerarquía Normativa
 
@@ -507,6 +508,8 @@ Cualquier enmienda a este motor que afecte:
 
 debe someterse a revisión por la Comisión de Desarrollo, conforme al proceso de ciclo de vida de motores del CORE.
 
+---
+
 # 14. Reglas de Evolución y Versionado (SemVer)
 
 La evolución de esta especificación se rige por Versionado Semántico adaptado a contratos de diseño conceptual.
@@ -523,8 +526,6 @@ Modificaciones incompatibles en:
 
 que obliguen a los motores consumidores a modificar su forma de comunicación.
 
----
-
 ## MINOR
 
 **v1.0.0 → v1.1.0**
@@ -535,8 +536,6 @@ Introducción de:
 - nuevos tipos estructurales de Nodo;
 - nuevos tipos de relación semántica.
 
----
-
 ## PATCH
 
 **v1.0.0 → v1.0.1**
@@ -546,6 +545,8 @@ Corrección de:
 - redacción;
 - clarificación de invariantes;
 - precisiones que no alteren el comportamiento del contrato.
+
+---
 
 # 15. Conclusión
 
