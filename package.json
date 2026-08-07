@@ -1,0 +1,23 @@
+{
+  "name": "@geosynch/core",
+  "version": "0.1.0",
+  "description": "Columna vertebral de GEOSYNCH: Core + Plugin Registry, validada con un motor de juguete.",
+  "private": true,
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/server.ts",
+    "validate": "ts-node test/validate-backbone.ts",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down"
+  },
+  "dependencies": {
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.11.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}

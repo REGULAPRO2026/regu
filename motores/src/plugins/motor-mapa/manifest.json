@@ -1,0 +1,10 @@
+{
+  "id": "motor-mapa",
+  "name": "Motor Mapa",
+  "version": "1.0.0",
+  "coreVersion": "compatible",
+  "nodesRecognized": ["LOCATION"],
+  "eventsEmitted": ["MAP_UPDATED"],
+  "eventsSubscribed": ["LOCATION_CREATED"],
+  "note": "Este archivo es informativo, para herramientas externas de discovery/documentación. El PluginRegistry actual de GEOSYNCH CORE NO lee manifest.json desde disco en runtime: el manifiesto que realmente rige es el objeto `manifest` embebido en MotorMapa.ts (propiedad `manifest` exigida por la interfaz MotorPlugin). Este JSON debe mantenerse sincronizado manualmente con ese objeto hasta que exista un mecanismo real de Plugin Discovery basado en archivos."
+}

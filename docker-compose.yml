@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: geosynch-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: geosynch
+      POSTGRES_PASSWORD: geosynch
+      POSTGRES_DB: geosynch_core
+    ports:
+      - "5432:5432"
+    volumes:
+      - geosynch_pg_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U geosynch -d geosynch_core"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  geosynch_pg_data:
