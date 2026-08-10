@@ -1,4 +1,4 @@
-import { CoreContext, MotorPlugin, MotorManifest, CanonicalEvent } from '../../domain/types';
+import { CoreContext, MotorPlugin, MotorManifest, CanonicalEvent } from '../../../../src/domain/types';
 import { MapProjectionService } from './application/MapProjectionService';
 import { parseMapLocation, InvalidLocationPayloadError } from './domain/MapLocation';
 

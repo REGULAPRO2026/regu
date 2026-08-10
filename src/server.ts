@@ -14,34 +14,46 @@ import { ProjectionEngine } from './application/ProjectionEngine';
 import { Runtime } from './application/Runtime';
 
 import { ToyMotor } from './plugins/toy-motor';
+import { MotorMapa } from '../motores/src/plugins/motor-mapa';
+
+import { startMapServer } from './http/map-server';
 
 /**
- * ÚNICA raíz de composición del sistema. Es intencional que este sea
- * el único archivo que importa simultáneamente clases de dominio y
- * clases de infraestructura (Postgres) — así, `domain/` y
- * `application/` se pueden auditar (Ley 9) verificando que NINGÚN
- * archivo fuera de este importe 'pg'.
+ * ÚNICA raíz de composición del sistema.
+ *
+ * Es intencional que este sea el único archivo que importa
+ * simultáneamente clases de dominio e infraestructura (Postgres).
+ *
+ * Así, domain/ y application/ pueden auditarse verificando
+ * que ningún archivo fuera de esta raíz importe directamente 'pg'.
  */
-export async function bootstrap() {
+export async function bootstrap(options: { startHttp?: boolean } = {}) {
   const pool = createPool();
   await assertDbReachable(pool);
+
   console.log('[Core] Base de datos alcanzable.');
 
-  // Adaptadores de infraestructura, cada uno implementando un puerto de dominio.
+  // Adaptadores de infraestructura.
   const nodeRepository = new PostgresNodeRepository(pool);
   const eventRepository = new PostgresEventRepository(pool);
   const permissionRepository = new PostgresPermissionRepository(pool);
-  const pluginRegistryRepository = new PostgresPluginRegistryRepository(pool);
-  const eventBus = new PostgresEventBus();
-  await eventBus.start();
-  console.log('[Core] Bus de eventos activo (LISTEN geosynch_events).');
+  const pluginRegistryRepository =
+    new PostgresPluginRegistryRepository(pool);
 
-  // Servicios de dominio, construidos solo con puertos (nunca con Postgres directo).
+  const eventBus = new PostgresEventBus();
+
+  await eventBus.start();
+
+  console.log(
+    '[Core] Bus de eventos activo (LISTEN geosynch_events).'
+  );
+
+  // Servicios de dominio.
   const nodeIdentityService = new NodeIdentityService(nodeRepository);
   const eventChainService = new EventChainService(eventRepository);
   const permissionEngine = new PermissionEngine(permissionRepository);
 
-  // Capa de aplicación (Runtime): ciclo de vida, proyecciones, operación.
+  // Capa de aplicación.
   const pluginRegistry = new PluginRegistry(
     nodeIdentityService,
     eventChainService,
@@ -49,22 +61,58 @@ export async function bootstrap() {
     pluginRegistryRepository,
     eventBus
   );
-  const projectionEngine = new ProjectionEngine(nodeRepository, eventBus);
 
-  const runtime = new Runtime(pluginRegistry, projectionEngine);
+  const projectionEngine = new ProjectionEngine(
+    nodeRepository,
+    eventBus
+  );
+
+  const runtime = new Runtime(
+    pluginRegistry,
+    projectionEngine
+  );
+
   await runtime.start();
 
-  // Registro del motor de juguete + su regla de proyección.
+  // Motor Contador.
   const toyMotor = new ToyMotor();
-  projectionEngine.registerRule('COUNTER_INCREMENTED', ToyMotor.projectionRule);
-  await runtime.registerMotor(toyMotor);
-  console.log('[Core] Motores activos:', runtime.listActiveMotors());
 
-  return { pool, eventBus, runtime, toyMotor };
+  projectionEngine.registerRule(
+    'COUNTER_INCREMENTED',
+    ToyMotor.projectionRule
+  );
+
+  await runtime.registerMotor(toyMotor);
+
+  // Motor Mapa.
+  const motorMapa = new MotorMapa();
+
+  await runtime.registerMotor(motorMapa);
+
+  console.log(
+    '[Core] Motores activos:',
+    runtime.listActiveMotors()
+  );
+
+  // Adaptador HTTP del Motor Mapa.
+// Se inicia solo cuando el proceso lo solicita.
+// Las pruebas del Core no deben levantar servidores externos.
+const mapServer = options.startHttp
+  ? startMapServer(motorMapa)
+  : null;
+
+return {
+  pool,
+  eventBus,
+  runtime,
+  toyMotor,
+  motorMapa,
+  mapServer,
+};
 }
 
 if (require.main === module) {
-  bootstrap().catch((err) => {
+  bootstrap({ startHttp: true }).catch((err) => {
     console.error('[Core] Fallo crítico al iniciar:', err);
     process.exit(1);
   });

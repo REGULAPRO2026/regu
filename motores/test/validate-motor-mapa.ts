@@ -14,7 +14,7 @@
  *
  * Uso: ts-node test/validate-motor-mapa.ts
  */
-import { NodeIdentityService } from '../src/domain/services/NodeIdentityService';
+import { NodeIdentityService } from '../../src/domain/services/NodeIdentityService';
 import { EventChainService } from '../src/domain/services/EventChainService';
 import { PermissionEngine } from '../src/domain/services/PermissionEngine';
 import { PluginRegistry } from '../src/application/PluginRegistry';
